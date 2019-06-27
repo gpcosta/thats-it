@@ -108,7 +108,7 @@ class View extends HttpResponse
     {
         ob_start();
         extract($this->variables);
-        require_once(__DIR__.'/../../src/View/'.$this->viewToShow.'.php');
+        require_once(getcwd().'/../../src/View/'.$this->viewToShow.'.php');
         return ob_get_clean();
     }
 }

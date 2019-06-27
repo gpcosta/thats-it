@@ -24,10 +24,10 @@ class Logger extends \Monolog\Logger
      */
     public function __construct(string $name)
     {
-        $debugStreamHandler = new StreamHandler(__DIR__."/../../log/debug.log", Logger::DEBUG);
-        $infoStreamHandler = new StreamHandler(__DIR__."/../../log/info.log", Logger::INFO);
-        $warningStreamHandler = new StreamHandler(__DIR__."/../../log/warning.log", Logger::WARNING);
-        $errorStreamHandler = new StreamHandler(__DIR__."/../../log/error.log", Logger::ERROR);
+        $debugStreamHandler = new StreamHandler(getcwd()."/../../log/debug.log", Logger::DEBUG);
+        $infoStreamHandler = new StreamHandler(getcwd()."/../../log/info.log", Logger::INFO);
+        $warningStreamHandler = new StreamHandler(getcwd()."/../../log/warning.log", Logger::WARNING);
+        $errorStreamHandler = new StreamHandler(getcwd()."/../../log/error.log", Logger::ERROR);
     
         $debugFilterHandler = new FilterHandler($debugStreamHandler, Logger::DEBUG, Logger::DEBUG);
         $infoFilterHandler = new FilterHandler($infoStreamHandler, Logger::INFO, Logger::INFO);

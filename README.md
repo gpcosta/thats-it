@@ -8,7 +8,7 @@ So, because I have a lot of free time (just kidding), I started my own framework
 
 Requirements
 --
-- You must have at least PHP 7.1
+- You must have at least PHP 7.2
 - Composer installed
 - if you want to use a DB, MySQL is the only one accepted (currently there are no support for other DBs)
 

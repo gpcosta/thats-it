@@ -19,7 +19,7 @@ class Folder
      */
     public static function getSourceFolder(): string
     {
-        return $_SERVER['PHP_SELF']."/src";
+        return getcwd()."/../../src";
     }
     
     /**
@@ -27,6 +27,6 @@ class Folder
      */
     public static function getGeneralConfigFolder(): string
     {
-        return $_SERVER['PHP_SELF'].'/config';
+        return getcwd().'/../../config';
     }
 }
