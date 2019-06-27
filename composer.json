@@ -27,10 +27,10 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "ThatsIt\\CliClient\\CliClient::createProject()"
+            "ThatsIt\\CliClient\\CliClient::createProject"
         ],
         "post-update-cmd": [
-            "ThatsIt\\CliClient\\CliClient::createProject()"
+            "ThatsIt\\CliClient\\CliClient::createProject"
         ]
     }
 }
