@@ -1,0 +1,5 @@
+{
+    "": "ThatsIt\\Command\\EmptyCommand\\EmptyCommand",
+    "verify": "ThatsIt\\Command\\VerifyCommand\\VerifyCommand",
+    "list": "ThatsIt\\Command\\ListCommand\\ListCommand"
+}

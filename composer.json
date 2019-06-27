@@ -1,0 +1,26 @@
+{
+    "name": "ThatsIt",
+    "authors": [
+        {
+            "name": "Gonçalo Costa",
+            "email": "goncalo.pereira.costa@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "ext-readline": "*",
+        "ext-mbstring": "*",
+        "ext-curl": "*",
+        "nikic/fast-route": "^1.3",
+        "filp/whoops": "^2.4",
+        "monolog/monolog": "^1.24"
+    },
+    "autoload": {
+        "psr-4": {
+            "ThatsIt\\": "ThatsIt/",
+            "App\\": "src/"
+        }
+    }
+}
