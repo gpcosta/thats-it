@@ -7,6 +7,7 @@
             "email": "goncalo.pereira.costa@gmail.com"
         }
     ],
+    "license": "MIT",
     "require": {
         "php": ">=7.1",
         "ext-pdo": "*",
@@ -18,10 +19,10 @@
         "filp/whoops": "^2.4",
         "monolog/monolog": "^1.24"
     },
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "ThatsIt\\": "ThatsIt/",
-            "App\\": "src/"
+            "ThatsIt\\": "ThatsIt/"
         }
     }
 }
