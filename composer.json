@@ -1,5 +1,6 @@
 {
-    "name": "ThatsIt",
+    "name": "gpcosta/ThatsIt",
+    "description": "A simple framework in PHP for personal projects. Easy to use and... That's It!",
     "authors": [
         {
             "name": "Gonçalo Costa",
