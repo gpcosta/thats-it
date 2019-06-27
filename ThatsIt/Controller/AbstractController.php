@@ -71,9 +71,10 @@ abstract class AbstractController
     {
         return $this->logger;
     }
-
+    
     /**
      * @return PDO
+     * @throws \ThatsIt\Exception\PlatformException
      */
 	protected function getPDO() : PDO
     {

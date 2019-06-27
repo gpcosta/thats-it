@@ -107,7 +107,7 @@ class VerifyConfigFolderState extends StateCommand
         return "<?php".PHP_EOL.
             PHP_EOL.
             "return array(".PHP_EOL.
-                "\t'environment' => 'development',".PHP_EOL.
+                "\t'environment' => 'development', // or 'production' when you're ready for it :)".PHP_EOL.
                 "\t'locationServer' => '".Folder::getSourceFolder()."/Public'".PHP_EOL.
             ");";
     }
@@ -124,7 +124,8 @@ class VerifyConfigFolderState extends StateCommand
                 "\t'port' => 3306,".PHP_EOL.
                 "\t'name' => 'any_name',".PHP_EOL.
                 "\t'user' => 'any_user',".PHP_EOL.
-                "\t'password' => 'any_password'".PHP_EOL.
+                "\t'password' => 'any_password',".PHP_EOL.
+                "\t'encoding' => 'utf8mb4'".PHP_EOL.
             ");";
     }
     

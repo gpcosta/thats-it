@@ -62,11 +62,12 @@ class View extends HttpResponse
     
     /**
      * @param string $name
+     * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
      * @param array $variables[name => value]
      * @return string
      * @throws PlatformException
      */
-    public function getUrl(string $name, array $variables = array()): string
+    public function getUrl(string $name, bool $withOptional = false, array $variables = array()): string
     {
         // just to load routes once
         if (!$this->routes) $this->routes = Configurations::getRoutesConfig();
@@ -82,13 +83,11 @@ class View extends HttpResponse
             $path = preg_replace("/\{".$name."(\:.*){0,1}\}/U", $value, $path);
         }
         
-        // will verify if there are some optional part without variables
-        preg_match("/\([^{}]*\)/", $path, $matches);
-        if (isset($matches[0])) {
+        if ($withOptional) {
             // if so removes just parenthesis
             $path = preg_replace("/\(|\)/", "", $path);
         } else {
-            // else removes everything
+            // else removes everything that is inside of parenthesis
             $path = preg_replace("/\(.*\)/", "", $path);
         }
         
@@ -109,7 +108,7 @@ class View extends HttpResponse
     {
         ob_start();
         extract($this->variables);
-        require_once(__DIR__.'/../../src/view/'.$this->viewToShow.'.php');
+        require_once(__DIR__.'/../../src/View/'.$this->viewToShow.'.php');
         return ob_get_clean();
     }
 }

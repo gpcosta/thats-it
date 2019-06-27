@@ -32,6 +32,16 @@ class PlatformException extends \Exception
     const ERROR_RESPONSE = 2;
     
     /**
+     * problems related to database
+     */
+    const ERROR_DB = 3;
+    
+    /**
+     * when a config file it was needed but it was missing
+     */
+    const ERROR_CONFIG_FILE_MISSING = 4;
+    
+    /**
      * PlatformException constructor.
      * @param string $message
      * @param int $code
