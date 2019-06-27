@@ -5,3 +5,4 @@ config/config.php
 config/database.php
 config/router.php
 log/
+src/
