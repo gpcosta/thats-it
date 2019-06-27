@@ -6,10 +6,10 @@
  * Time: 15:46
  */
 
-namespace ThatsIt\Command\VerifyCommand;
+namespace ThatsIt\CliClient\Command\VerifyCommand;
 
-use ThatsIt\Command\Command;
-use ThatsIt\Command\VerifyCommand\State\VerifyInitialState;
+use ThatsIt\CliClient\Command\Command;
+use ThatsIt\CliClient\Command\VerifyCommand\State\VerifyInitialState;
 
 /**
  * Class InitCommand

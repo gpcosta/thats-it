@@ -6,11 +6,10 @@
  * Time: 16:13
  */
 
-namespace ThatsIt\Command\EmptyCommand;
+namespace ThatsIt\CliClient\Command\EmptyCommand;
 
-use ThatsIt\Command\Command;
-use ThatsIt\Command\EmptyCommand\State\WelcomeState;
-use ThatsIt\Command\ListCommand\State\ListState;
+use ThatsIt\CliClient\Command\Command;
+use ThatsIt\CliClient\Command\EmptyCommand\State\WelcomeState;
 
 /**
  * Class EmptyCommand

@@ -1,8 +1,4 @@
 .htaccess
 vendor/
 .idea
-config/config.php
-config/database.php
-config/router.php
 log/
-src/

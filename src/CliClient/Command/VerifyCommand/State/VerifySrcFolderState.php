@@ -6,9 +6,9 @@
  * Time: 10:19
  */
 
-namespace ThatsIt\Command\VerifyCommand\State;
+namespace ThatsIt\CliClient\Command\VerifyCommand\State;
 
-use ThatsIt\Command\StateCommand;
+use ThatsIt\CliClient\Command\StateCommand;
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Folder\Folder;
 
@@ -166,7 +166,7 @@ class VerifySrcFolderState extends StateCommand
     private function getIndexContent(): string
     {
         return "<?php".PHP_EOL.PHP_EOL.
-            "require_once '".Folder::getThatsItFolder()."/EntryPoint/index.php';";
+            "ThatsIt\\EntryPoint\\Door::openDoor();".PHP_EOL;
     }
     
     private function getErrorContent(int $error): string

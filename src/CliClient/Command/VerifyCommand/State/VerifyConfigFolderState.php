@@ -6,9 +6,9 @@
  * Time: 10:02
  */
 
-namespace ThatsIt\Command\VerifyCommand\State;
+namespace ThatsIt\CliClient\Command\VerifyCommand\State;
 
-use ThatsIt\Command\StateCommand;
+use ThatsIt\CliClient\Command\StateCommand;
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Folder\Folder;
 
@@ -50,7 +50,7 @@ class VerifyConfigFolderState extends StateCommand
      */
     private function verifyConfigFolder(): void
     {
-        if ((!is_dir(Configurations::getGeneralConfigFolder()) && !mkdir(Configurations::getGeneralConfigFolder()))) {
+        if ((!is_dir(Folder::getGeneralConfigFolder()) && !mkdir(Folder::getGeneralConfigFolder()))) {
             throw new \Exception("It was not possible to create config folder." . PHP_EOL);
         } else {
             print_r("\t-config" . PHP_EOL);

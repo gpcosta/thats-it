@@ -6,10 +6,10 @@
  * Time: 16:13
  */
 
-namespace ThatsIt\Command\ListCommand;
+namespace ThatsIt\CliClient\Command\ListCommand;
 
-use ThatsIt\Command\Command;
-use ThatsIt\Command\ListCommand\State\ListState;
+use ThatsIt\CliClient\Command\Command;
+use ThatsIt\CliClient\Command\ListCommand\State\ListState;
 
 /**
  * Class ListCommand

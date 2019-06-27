@@ -9,6 +9,7 @@
 namespace ThatsIt\Configurations;
 
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\Folder\Folder;
 
 /**
  * Class Configurations
@@ -19,17 +20,9 @@ class Configurations
     /**
      * @return string
      */
-    public static function getGeneralConfigFolder(): string
-    {
-        return __DIR__.'/../../config';
-    }
-    
-    /**
-     * @return string
-     */
     public static function getGeneralConfigFile(): string
     {
-        return self::getGeneralConfigFolder().'/config.php';
+        return Folder::getGeneralConfigFolder().'/config.php';
     }
     
     /**
@@ -37,7 +30,7 @@ class Configurations
      */
     public static function getDatabaseConfigFile(): string
     {
-        return self::getGeneralConfigFolder().'/database.php';
+        return Folder::getGeneralConfigFolder().'/database.php';
     }
     
     /**
@@ -45,7 +38,7 @@ class Configurations
      */
     public static function getRoutesConfigFile(): string
     {
-        return self::getGeneralConfigFolder().'/router.php';
+        return Folder::getGeneralConfigFolder().'/router.php';
     }
     
     /**

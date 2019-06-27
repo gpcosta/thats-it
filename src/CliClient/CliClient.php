@@ -1,8 +1,8 @@
 <?php
 
-namespace ThatsIt;
+namespace ThatsIt\CliClient;
 
-require_once 'vendor/autoload.php';
+use ThatsIt\CliClient\Command\VerifyCommand\VerifyCommand;
 
 /**
  * Class CliClient
@@ -11,10 +11,19 @@ require_once 'vendor/autoload.php';
 class CliClient
 {
     /**
+     * method to be called when is run "composer create-project"
+     */
+    public static function createProject(): void
+    {
+        $command = new VerifyCommand();
+        $command->performCommand(1, array());
+    }
+    
+    /**
      * @param int $argc
      * @param array $argv
      */
-    function performCommand(int $argc, array $argv)
+    public function performCommand(int $argc, array $argv)
     {
         $possibleCommands = json_decode(file_get_contents("ThatsIt/Command/commands.json"), true);
         
@@ -35,11 +44,4 @@ class CliClient
             print_r($e->getMessage()."\n");
         }
     }
-}
-
-if (php_sapi_name() == "cli") {
-    // In cli-mode
-    
-    $cliClient = new CliClient();
-    $cliClient->performCommand($argc, $argv);
 }

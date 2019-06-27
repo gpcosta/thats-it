@@ -6,7 +6,7 @@
  * Time: 15:41
  */
 
-namespace ThatsIt\Command;
+namespace ThatsIt\CliClient\Command;
 
 /**
  * Class Command

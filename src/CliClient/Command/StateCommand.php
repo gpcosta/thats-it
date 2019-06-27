@@ -6,7 +6,7 @@
  * Time: 15:49
  */
 
-namespace ThatsIt\Command;
+namespace ThatsIt\CliClient\Command;
 
 /**
  * Interface StateCommand

@@ -19,14 +19,14 @@ class Folder
      */
     public static function getSourceFolder(): string
     {
-        return __DIR__."/../../src";
+        return getcwd()."/src";
     }
     
     /**
      * @return string
      */
-    public static function getThatsItFolder(): string
+    public static function getGeneralConfigFolder(): string
     {
-        return __DIR__."/..";
+        return getcwd().'/config';
     }
 }

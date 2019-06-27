@@ -22,7 +22,12 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "ThatsIt\\": "ThatsIt/"
+            "ThatsIt\\": "src/"
         }
+    },
+    "scripts": {
+        "post-create-project-cmd": [
+            "ThatsIt\\CliClient\\CliClient::createProject()"
+        ]
     }
 }

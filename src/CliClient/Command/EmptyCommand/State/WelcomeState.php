@@ -6,10 +6,10 @@
  * Time: 16:16
  */
 
-namespace ThatsIt\Command\EmptyCommand\State;
+namespace ThatsIt\CliClient\Command\EmptyCommand\State;
 
-use ThatsIt\Command\ListCommand\State\ListState;
-use ThatsIt\Command\StateCommand;
+use ThatsIt\CliClient\Command\ListCommand\State\ListState;
+use ThatsIt\CliClient\Command\StateCommand;
 
 class WelcomeState extends StateCommand
 {
