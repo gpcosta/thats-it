@@ -31,6 +31,9 @@
         ],
         "post-update-cmd": [
             "ThatsIt\\CliClient\\CliClient::createProject"
+        ],
+        "post-create-project-cmd": [
+            "ThatsIt\\CliClient\\CliClient::createProject"
         ]
     }
 }
