@@ -25,15 +25,5 @@
             "ThatsIt\\": "src/"
         }
     },
-    "scripts": {
-        "post-install-cmd": [
-            "ThatsIt\\CliClient\\CliClient::createProject"
-        ],
-        "post-update-cmd": [
-            "ThatsIt\\CliClient\\CliClient::createProject"
-        ],
-        "post-create-project-cmd": [
-            "ThatsIt\\CliClient\\CliClient::createProject"
-        ]
-    }
+    "bin": ["bin/ThatsIt"]
 }

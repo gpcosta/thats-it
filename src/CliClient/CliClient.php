@@ -25,7 +25,7 @@ class CliClient
      */
     public function performCommand(int $argc, array $argv)
     {
-        $possibleCommands = json_decode(file_get_contents("ThatsIt/Command/commands.json"), true);
+        $possibleCommands = json_decode(file_get_contents(__DIR__."/commands.json"), true);
         
         try {
             if ($argc == 1) {

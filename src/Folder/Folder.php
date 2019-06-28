@@ -19,7 +19,7 @@ class Folder
      */
     public static function getSourceFolder(): string
     {
-        return getcwd()."/../../src";
+        return getcwd()."/src";
     }
     
     /**
@@ -27,6 +27,6 @@ class Folder
      */
     public static function getGeneralConfigFolder(): string
     {
-        return getcwd().'/../../config';
+        return getcwd().'/config';
     }
 }

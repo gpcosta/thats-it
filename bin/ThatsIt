@@ -1,11 +1,94 @@
-#!/usr/bin/env php
-<?php
+#!/usr/bin/env bash
 
-require __DIR__.'/../vendor/autoload.php';
+# echo -e allows escape with backslashes
 
-if (false === in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-    echo 'You cannot invoke console';
-}
+if [ ! -e "config" ]
+then
+    mkdir "config"
+    echo "Created config/"
+fi
 
-$cliClient = new ThatsIt\CliClient\CliClient();
-$cliClient->performCommand($argc, $argv);
+if [ ! -e "config/config.php" ];
+then
+    echo '<?php' > config/config.php
+    echo >> config/config.php
+    echo 'return [' >> config/config.php
+    echo -e '\t"environment" => "development", // or "production" when you'"'"'re ready for it :)' >> config/config.php
+    echo -e '\t"locationServer" => "'$(pwd)'/src/Public" // where you put index.php' >> config/config.php
+    echo '];' >> config/config.php
+
+    echo "Created config/config.php"
+fi
+
+if [ ! -e "config/database.php" ];
+then
+    echo '<?php' > config/database.php
+    echo >> config/database.php
+    echo 'return [' >> config/database.php
+    echo -e '\t"host" => "localhost",' >> config/database.php
+    echo -e '\t"port" => 3306,' >> config/database.php
+    echo -e '\t"name" => "any_name",' >> config/database.php
+    echo -e '\t"user" => "any_user",' >> config/database.php
+    echo -e '\t"password" => "any_password"' >> config/database.php
+    echo '];' >> config/database.php
+
+    echo "Created config/database.php"
+fi
+
+
+if [ ! -e "config/router.php" ];
+then
+    echo '<?php' > config/router.php
+    echo >> config/router.php
+    echo 'return [' >> config/router.php
+    echo -e '\t"home" => [' >> config/router.php
+    echo -e     '\t\t"path" => "/{name}",' >> config/router.php
+    echo -e     '\t\t"httpMethods" => ["GET", "POST"], // accept "GET", "POST", "PUT" and "DELETE"' >> config/router.php
+    echo -e     '\t\t"controller" => "App\\Controller\\HomeController",' >> config/router.php
+    echo -e     '\t\t"function" => "homeFunction",' >> config/router.php
+    echo -e     '\t\t"parameters" => [' >> config/router.php
+    echo -e         '\t\t\t"name" => [], // it means that is a required parameter' >> config/router.php
+    echo -e         '\t\t\t"age" => [' >> config/router.php
+    echo -e             '\t\t\t\t"default" => 18' >> config/router.php
+    echo -e         '\t\t\t]' >> config/router.php
+    echo -e     '\t\t]' >> config/router.php
+    echo -e '\t]' >> config/router.php
+    echo '];' >> config/router.php
+
+    echo "Created config/router.php"
+fi
+
+if [ ! -e "src" ];
+then
+    mkdir "src"
+    echo "Created src/"
+fi
+
+if [ ! -e "src/Controller" ]
+then
+    mkdir "src/Controller"
+    echo "Created src/Controller/"
+fi
+
+if [ ! -e "src/Public" ];
+then
+    mkdir "src/Public"
+    echo "Created src/Public/"
+fi
+
+if [ ! -e "src/Public/index.php" ];
+then
+    echo "<?php" >> src/Public/index.php
+    echo >> src/Public/index.php
+    echo "require_once '../../vendor/autoload.php';" >> src/Public/index.php
+    echo >> src/Public/index.php
+    echo "ThatsIt\\EntryPoint\\Door::openDoor();" >> src/Public/index.php
+
+    echo "Created src/Public/index.php"
+fi
+
+if [ ! -e "src/View" ];
+then
+    mkdir "src/View"
+    echo "Created src/View/"
+fi
