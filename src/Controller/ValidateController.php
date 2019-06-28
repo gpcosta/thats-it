@@ -137,6 +137,8 @@ class ValidateController
     }
     
     /**
+     * if $var is null, this method will return true because null is from any type
+     *
      * @param $var
      * @param string $type
      * @return bool
@@ -149,12 +151,13 @@ class ValidateController
             'integer'   => 'is_int',
             'int'       => 'is_int',
             'float'     => 'is_float',
+            'double'    => 'is_float',
             'string'    => 'is_string',
             'array'     => 'is_array',
             'resource'  => 'is_resource'
         );
         
-        return call_user_func($typeFunctions[$type], $var);
+        return is_null($var) || call_user_func($typeFunctions[$type], $var);
     }
     
     /**
