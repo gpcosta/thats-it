@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+if (false === in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+    echo 'You cannot invoke console';
+}
+
+$cliClient = new ThatsIt\CliClient\CliClient();
+$cliClient->performCommand($argc, $argv);
