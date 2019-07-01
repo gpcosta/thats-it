@@ -80,3 +80,73 @@ if not exist "src/View" (
     mkdir src\View
     echo Created src/View/
 )
+
+if not exist "src/View/Error" (
+    mkdir src\View\Error
+    echo Created src/View/Error/
+)
+
+if not exist "src/View/Error/error404.php" (
+    echo ^<^?php > src/View/Error/error404.php
+    echo. >> src/View/Error/error404.php
+    echo // this page represents the not found requests >> src/View/Error/error404.php
+    echo. >> src/View/Error/error404.php
+    echo // in this page you will have the variable $error available >> src/View/Error/error404.php
+    echo // this variable will have the message of the error >> src/View/Error/error404.php
+    echo // this will have the last message that you passed to an exception >> src/View/Error/error404.php
+    echo. >> src/View/Error/error404.php
+    echo ^?^> >> src/View/Error/error404.php
+    echo. >> src/View/Error/error404.php
+    echo ^<html^> >> src/View/Error/error404.php
+    echo    ^<div^> >> src/View/Error/error404.php
+    echo        Error 404!^<br^> >> src/View/Error/error404.php
+    echo        ^<^?php echo $error; ^?^> >> src/View/Error/error404.php
+    echo    ^</div^> >> src/View/Error/error404.php
+    echo ^</html^> >> src/View/Error/error404.php
+
+    echo Created src/View/Error/error404.php
+)
+
+if not exist "src/View/Error/error405.php" (
+    echo ^<^?php > src/View/Error/error405.php
+    echo. >> src/View/Error/error405.php
+    echo // this page represents the 'method not allowed' errors >> src/View/Error/error405.php
+    echo // ^(when user doesn't provide all needed info or make a POST instead a GET for example^) >> src/View/Error/error405.php
+    echo. >> src/View/Error/error405.php
+    echo // in this page you will have the variable $error available >> src/View/Error/error405.php
+    echo // this variable will have the message of the error >> src/View/Error/error405.php
+    echo // this will have the last message that you passed to an exception >> src/View/Error/error405.php
+    echo. >> src/View/Error/error405.php
+    echo ^?^> >> src/View/Error/error405.php
+    echo. >> src/View/Error/error405.php
+    echo ^<html^> >> src/View/Error/error405.php
+    echo    ^<div^> >> src/View/Error/error405.php
+    echo        Error 405!^<br^> >> src/View/Error/error405.php
+    echo        ^<^?php echo $error; ^?^> >> src/View/Error/error405.php
+    echo    ^</div^> >> src/View/Error/error405.php
+    echo ^</html^> >> src/View/Error/error405.php
+
+    echo Created src/View/Error/error405.php
+)
+
+if not exist "src/View/Error/error500.php" (
+    echo ^<^?php > src/View/Error/error500.php
+    echo. >> src/View/Error/error500.php
+    echo // this page represents the 'internal server error' errors >> src/View/Error/error500.php
+    echo // ^(when something unexpected happen^) >> src/View/Error/error500.php
+    echo. >> src/View/Error/error500.php
+    echo // in this page you will have the variable $error available >> src/View/Error/error500.php
+    echo // this variable will have the message of the error >> src/View/Error/error500.php
+    echo // this will have the last message that you passed to an exception >> src/View/Error/error500.php
+    echo. >> src/View/Error/error500.php
+    echo ^?^> >> src/View/Error/error500.php
+    echo. >> src/View/Error/error500.php
+    echo ^<html^> >> src/View/Error/error500.php
+    echo    ^<div^> >> src/View/Error/error500.php
+    echo        Error 500!^<br^> >> src/View/Error/error500.php
+    echo        ^<^?php echo $error; ^?^> >> src/View/Error/error500.php
+    echo    ^</div^> >> src/View/Error/error500.php
+    echo ^</html^> >> src/View/Error/error500.php
+
+    echo Created src/View/Error/error500.php
+)

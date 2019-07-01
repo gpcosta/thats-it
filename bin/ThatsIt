@@ -10,7 +10,7 @@ fi
 
 if [ ! -e "config/config.php" ];
 then
-    echo '<?php' > config/config.php
+    echo '<?php' >> config/config.php
     echo >> config/config.php
     echo 'return [' >> config/config.php
     echo -e '\t"environment" => "development", // or "production" when you'"'"'re ready for it :)' >> config/config.php
@@ -22,7 +22,7 @@ fi
 
 if [ ! -e "config/database.php" ];
 then
-    echo '<?php' > config/database.php
+    echo '<?php' >> config/database.php
     echo >> config/database.php
     echo 'return [' >> config/database.php
     echo -e '\t"host" => "localhost",' >> config/database.php
@@ -38,7 +38,7 @@ fi
 
 if [ ! -e "config/router.php" ];
 then
-    echo '<?php' > config/router.php
+    echo '<?php' >> config/router.php
     echo >> config/router.php
     echo 'return [' >> config/router.php
     echo -e '\t"home" => [' >> config/router.php
@@ -91,4 +91,78 @@ if [ ! -e "src/View" ];
 then
     mkdir "src/View"
     echo "Created src/View/"
+fi
+
+if [ ! -e "src/View/Error" ];
+then
+    mkdir "src/View/Error"
+    echo "Created src/View/Error/"
+fi
+
+if [ ! -e "src/View/Error/error404.php" ];
+then
+    echo "<?php" >> src/View/Error/error404.php
+    echo >> src/View/Error/error404.php
+    echo "// this page represents the not found requests" >> src/View/Error/error404.php
+    echo >> src/View/Error/error404.php
+    echo "// in this page you will have the variable $error available" >> src/View/Error/error404.php
+    echo "// this variable will have the message of the error" >> src/View/Error/error404.php
+    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error404.php
+    echo >> src/View/Error/error404.php
+    echo "?>" >> src/View/Error/error404.php
+    echo >> src/View/Error/error404.php
+    echo "<html>" >> src/View/Error/error404.php
+    echo -e "\t<div>" >> src/View/Error/error404.php
+    echo -e     "\t\tError 404!^<br^>" >> src/View/Error/error404.php
+    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error404.php
+    echo -e "\t</div>" >> src/View/Error/error404.php
+    echo "</html>" >> src/View/Error/error404.php
+
+    echo "Created src/View/Error/error404.php"
+fi
+
+if [ ! -e "src/View/Error/error405.php" ];
+then
+    echo "<?php" >> src/View/Error/error405.php
+    echo >> src/View/Error/error405.php
+    echo "// this page represents the 'method not allowed' errors" >> src/View/Error/error405.php
+    echo "// (when user doesn't provide all needed info or make a POST instead a GET for example)" >> src/View/Error/error405.php
+    echo >> src/View/Error/error405.php
+    echo "// in this page you will have the variable $error available" >> src/View/Error/error405.php
+    echo "// this variable will have the message of the error" >> src/View/Error/error405.php
+    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error405.php
+    echo >> src/View/Error/error405.php
+    echo "?>" >> src/View/Error/error405.php
+    echo >> src/View/Error/error405.php
+    echo "<html>" >> src/View/Error/error405.php
+    echo -e "\t<div>" >> src/View/Error/error405.php
+    echo -e     "\t\tError 405!^<br^>" >> src/View/Error/error405.php
+    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error405.php
+    echo -e "\t</div>" >> src/View/Error/error405.php
+    echo "</html>" >> src/View/Error/error405.php
+
+    echo "Created src/View/Error/error405.php"
+fi
+
+if [ ! -e "src/View/Error/error500.php" ];
+then
+    echo "<?php" >> src/View/Error/error500.php
+    echo >> src/View/Error/error500.php
+    echo "// this page represents the 'internal server error' errors" >> src/View/Error/error500.php
+    echo "// (when something unexpected happen)" >> src/View/Error/error500.php
+    echo >> src/View/Error/error500.php
+    echo "// in this page you will have the variable $error available" >> src/View/Error/error500.php
+    echo "// this variable will have the message of the error" >> src/View/Error/error500.php
+    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error500.php
+    echo >> src/View/Error/error500.php
+    echo "?>" >> src/View/Error/error500.php
+    echo >> src/View/Error/error500.php
+    echo "<html>" >> src/View/Error/error500.php
+    echo -e "\t<div>" >> src/View/Error/error500.php
+    echo -e     "\t\tError 500!^<br^>" >> src/View/Error/error500.php
+    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error500.php
+    echo -e "\t</div>" >> src/View/Error/error500.php
+    echo "</html>" >> src/View/Error/error500.php
+
+    echo "Created src/View/Error/error500.php"
 fi
