@@ -20,11 +20,6 @@ class RedirectResponse extends HttpResponse
     private $url;
     
     /**
-     * @var int
-     */
-    private $statusCode;
-    
-    /**
      * RedirectResponse constructor.
      * @param string $url
      * @param int $statusCode
