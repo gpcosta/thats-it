@@ -80,13 +80,13 @@ class Door
         } catch (ClientException $e) {
             $error = $e->getMessage();
             if ($e->getCode() == 404) {
-                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error404.php',
+                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error404',
                     404, $e->getMessage());
             } else if ($e->getCode() == 405) {
-                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error405.php',
+                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error405',
                     405, $e->getMessage());
             } else {
-                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error500.php',
+                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error500',
                     500, $e->getMessage());
             }
             die;
