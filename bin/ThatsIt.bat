@@ -22,7 +22,7 @@ if not exist "config/database.php" (
     echo return [ >> config/database.php
     echo    "host" =^> "localhost", >> config/database.php
     echo    "port" =^> 3306, >> config/database.php
-    echo    "name" =^> "any_name", >> config/database.php
+    echo    "dbName" =^> "any_name", >> config/database.php
     echo    "user" =^> "any_user", >> config/database.php
     echo    "password" =^> "any_password" >> config/database.php
     echo ]; >> config/database.php
@@ -71,7 +71,7 @@ if not exist "src/Public/index.php" (
     echo. >> src/Public/index.php
     echo require_once '../../vendor/autoload.php'; >> src/Public/index.php
     echo. >> src/Public/index.php
-    echo ThatsIt\EntryPoint\Door::openDoor^(^); >> src/Public/index.php
+    echo ThatsIt\EntryPoint\Door::openDoor^(__DIR__^); >> src/Public/index.php
 
     echo Created src/Public/index.php
 )

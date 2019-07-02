@@ -15,11 +15,29 @@ namespace ThatsIt\Folder;
 class Folder
 {
     /**
+     * @var string
+     */
+    private static $indexPath;
+    
+    /**
+     * @param string $path
+     */
+    public static function setIndexPath(string $path): void
+    {
+        // if the last char of $path is "/", remove it
+        if (substr($path, strlen($path) - 1, 1) == "/") {
+            $path = substr($path, 0, strlen($path) - 1);
+        }
+        self::$indexPath = $path;
+    }
+    
+    /**
      * @return string
      */
     public static function getSourceFolder(): string
     {
-        return getcwd()."/src";
+        // alternative: self::$indexPath."/../../src";
+        return self::$indexPath."/..";
     }
     
     /**
@@ -27,6 +45,6 @@ class Folder
      */
     public static function getGeneralConfigFolder(): string
     {
-        return getcwd().'/config';
+        return self::$indexPath.'/../../config';
     }
 }

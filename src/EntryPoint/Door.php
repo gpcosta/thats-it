@@ -27,11 +27,14 @@ use ThatsIt\Response\SendResponse;
 class Door
 {
     /**
+     * @param string $indexPath
      * @throws PlatformException
      * @throws \ErrorException
      */
-    public static function openDoor(): void
+    public static function openDoor(string $indexPath): void
     {
+        Folder::setIndexPath($indexPath);
+        
         set_error_handler(function ($severity, $message, $file, $line) {
             if (!(error_reporting() & $severity)) {
                 // This error code is not included in error_reporting
