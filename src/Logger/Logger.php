@@ -10,6 +10,7 @@ namespace ThatsIt\Logger;
 
 use Monolog\Handler\FilterHandler;
 use Monolog\Handler\StreamHandler;
+use ThatsIt\Folder\Folder;
 
 /**
  * Class Logger
@@ -24,10 +25,10 @@ class Logger extends \Monolog\Logger
      */
     public function __construct(string $name)
     {
-        $debugStreamHandler = new StreamHandler(getcwd()."/../../log/debug.log", Logger::DEBUG);
-        $infoStreamHandler = new StreamHandler(getcwd()."/../../log/info.log", Logger::INFO);
-        $warningStreamHandler = new StreamHandler(getcwd()."/../../log/warning.log", Logger::WARNING);
-        $errorStreamHandler = new StreamHandler(getcwd()."/../../log/error.log", Logger::ERROR);
+        $debugStreamHandler = new StreamHandler(Folder::getLogFolder()."/debug.log", Logger::DEBUG);
+        $infoStreamHandler = new StreamHandler(Folder::getLogFolder()."/info.log", Logger::INFO);
+        $warningStreamHandler = new StreamHandler(Folder::getLogFolder()."/warning.log", Logger::WARNING);
+        $errorStreamHandler = new StreamHandler(Folder::getLogFolder()."/error.log", Logger::ERROR);
     
         $debugFilterHandler = new FilterHandler($debugStreamHandler, Logger::DEBUG, Logger::DEBUG);
         $infoFilterHandler = new FilterHandler($infoStreamHandler, Logger::INFO, Logger::INFO);

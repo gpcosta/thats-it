@@ -47,4 +47,12 @@ class Folder
     {
         return self::$indexPath.'/../../config';
     }
+    
+    /**
+     * @return string
+     */
+    public static function getLogFolder(): string
+    {
+        return self::$indexPath.'/../../log';
+    }
 }

@@ -10,6 +10,7 @@ namespace ThatsIt\Response;
 
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\Folder\Folder;
 
 /**
  * Class View
@@ -108,7 +109,7 @@ class View extends HttpResponse
     {
         ob_start();
         extract($this->variables);
-        require_once(getcwd().'/../../src/View/'.$this->viewToShow.'.php');
+        require_once(Folder::getSourceFolder().'/View/'.$this->viewToShow.'.php');
         return ob_get_clean();
     }
 }
