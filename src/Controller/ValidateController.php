@@ -146,18 +146,24 @@ class ValidateController
     private function verifyType($var, string $type): bool
     {
         $typeFunctions = array(
-            'boolean'   => 'is_bool',
-            'bool'      => 'is_bool',
-            'integer'   => 'is_int',
-            'int'       => 'is_int',
-            'float'     => 'is_float',
-            'double'    => 'is_float',
-            'string'    => 'is_string',
-            'array'     => 'is_array',
-            'resource'  => 'is_resource'
+            'boolean'   => ['boolval', 'is_bool'],
+            'bool'      => ['boolval', 'is_bool'],
+            'integer'   => ['intval', 'is_int'],
+            'int'       => ['intval', 'is_int'],
+            'float'     => ['floatval', 'is_float'],
+            'double'    => ['doubleval', 'is_float'],
+            'string'    => ['strval', 'is_string'],
+            'array'     => ['is_array'],
+            'resource'  => ['is_resource']
         );
-        
-        return is_null($var) || call_user_func($typeFunctions[$type], $var);
+    
+        $isSameType = is_null($var);
+        if (!$isSameType && array_key_exists($type, $typeFunctions)) {
+            $isSameType = call_user_func($typeFunctions[$type][0], $var);
+            if (count($typeFunctions[$type]) == 2)
+                $isSameType = call_user_func($typeFunctions[$type][1], $isSameType);
+        }
+        return $isSameType;
     }
     
     /**
