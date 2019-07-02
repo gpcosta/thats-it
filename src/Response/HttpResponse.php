@@ -187,17 +187,6 @@ abstract class HttpResponse
     }
     
     /**
-     * Sets the headers for a redirect.
-     *
-     * @param $url
-     */
-    public function redirect($url): void
-    {
-        $this->setHeader('Location', $url);
-        $this->setStatusCode(301);
-    }
-    
-    /**
      * @return array[string]
      */
     private function getRequestLineHeaders(): array
