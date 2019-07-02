@@ -7,6 +7,7 @@ use ThatsIt\Database\Database;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
+use ThatsIt\Response\RedirectResponse;
 
 /**
  * Class AbstractController
@@ -87,15 +88,14 @@ abstract class AbstractController
      *
      * @param string $routeName
      * @param array $params
+     * @return RedirectResponse
      * @throws PlatformException
      */
-    protected function redirectToRoute(string $routeName, array $params = array()): void
+    protected function redirectToRoute(string $routeName, array $params = array()): RedirectResponse
     {
         if (isset($this->getRoutes()[$routeName]['path'])) {
-            header($this->getRoutes()[$routeName]['path'].
-                (count($params) > 0 ? "?".http_build_query($params) : "")
-            );
-            die;
+            $url = $this->getRoutes()[$routeName]['path'].(count($params) > 0 ? "?".http_build_query($params) : "");
+            return new RedirectResponse($url, 302);
         } else {
             throw new PlatformException(
                 "There are no possible redirect for ".$routeName.".",

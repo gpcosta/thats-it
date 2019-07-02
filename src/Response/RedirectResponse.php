@@ -8,28 +8,41 @@
 
 namespace ThatsIt\Response;
 
-
+/**
+ * Class RedirectResponse
+ * @package ThatsIt\Response
+ */
 class RedirectResponse extends HttpResponse
 {
-    private $statusCode;
-    
-    public function __construct(int $statusCode = 302)
-    {
-        if ($statusCode < 300 && $statusCode >= 400) $statusCode = 302;
-        $this->statusCode = $statusCode;
-    }
-    
-    public function getContent(): string { return ""; }
+    /**
+     * @var string
+     */
+    private $url;
     
     /**
-     * Sets the headers for a redirect.
-     *
+     * @var int
+     */
+    private $statusCode;
+    
+    /**
+     * RedirectResponse constructor.
      * @param string $url
      * @param int $statusCode
      */
-    public function redirect(string $url): void
+    public function __construct(string $url, int $statusCode = 302)
     {
-        $this->setHeader('Location', $url);
+        $this->url = $url;
+        if ($statusCode < 300 && $statusCode >= 400) $statusCode = 302;
+        $this->statusCode = $statusCode;
+    
+        $this->setHeader('Location', $this->url);
         $this->setStatusCode($this->statusCode);
     }
+    
+    /**
+     * There is no content in this RedirectResponse
+     *
+     * @return string
+     */
+    public function getContent(): string { return ""; }
 }
