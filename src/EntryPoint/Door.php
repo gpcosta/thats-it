@@ -16,6 +16,7 @@ use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\JsonResponse;
 use ThatsIt\Response\SendResponse;
+use ThatsIt\Response\View;
 
 /**
  * Class Door
@@ -47,7 +48,7 @@ class Door
         try {
             $logger = new Logger('ThatsIt');
         } catch (\Exception $e) {
-            self::sendErrorMessage(500, [
+            self::sendJsonErrorMessage(500, [
                 "error" => "The service that you are trying to contact cannot fulfill your request at the moment."
             ]);
         }
@@ -64,7 +65,7 @@ class Door
                 $whoops->register();
             }
         } catch (\Exception $e) {
-            self::sendErrorMessage(500, [
+            self::sendJsonErrorMessage(500, [
                 "error" => "filp/whoops cannot load."
             ]);
         }
@@ -78,16 +79,20 @@ class Door
             $entryPoint->callController();
         } catch (ClientException $e) {
             $error = $e->getMessage();
-            if ($e->getCode() == 404)
-                require_once(Folder::getSourceFolder().'/View/Error/error404.php');
-            else if ($e->getCode() == 405)
-                require_once(Folder::getSourceFolder().'/View/Error/error405.php');
-            else
-                require_once(Folder::getSourceFolder().'/View/Error/error500.php');
+            if ($e->getCode() == 404) {
+                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error404.php',
+                    404, $e->getMessage());
+            } else if ($e->getCode() == 405) {
+                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error405.php',
+                    405, $e->getMessage());
+            } else {
+                self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error500.php',
+                    500, $e->getMessage());
+            }
             die;
         } catch (PlatformException | \ErrorException | \Exception $e) {
             if ($environment === 'production') {
-                self::sendErrorMessage(500, [
+                self::sendJsonErrorMessage(500, [
                     "error" => "The service that you are trying to contact cannot fulfill your request at the moment."
                 ]);
                 if ($e instanceof PlatformException)
@@ -107,11 +112,25 @@ class Door
      * @param int $statusCode
      * @param array $message
      */
-    public static function sendErrorMessage(int $statusCode, array $message): void
+    public static function sendJsonErrorMessage(int $statusCode, array $message): void
     {
         $response = new JsonResponse();
         $response->setStatusCode($statusCode);
         $response->setVariables($message);
+        $send = new SendResponse($response);
+        $send->send();
+    }
+    
+    /**
+     * @param string $page
+     * @param int $statusCode
+     * @param string $error
+     */
+    public static function sendViewErrorMessage(string $page, int $statusCode, string $error): void
+    {
+        $response = new View($page);
+        $response->setStatusCode($statusCode);
+        $response->setVariables(['error', $error]);
         $send = new SendResponse($response);
         $send->send();
     }
