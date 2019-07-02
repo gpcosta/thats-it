@@ -28,6 +28,7 @@ class Database
     
     /**
      * Database constructor.
+     * @throws PlatformException
      */
     public function __construct()
     {
@@ -51,8 +52,14 @@ class Database
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES '" . $config['encoding'] . "' COLLATE '" . $config['collation'] . "'"
                 ));
             }
+        } catch (PlatformException $e) {
+            throw $e;
+        } catch (\PDOException $e) {
+            $this->exceptionAtTheBeginning = new PlatformException("There was a problem connecting to DB. ".
+                "Please verify if config/database.php has the correct info.", PlatformException::ERROR_DB, $e);
         } catch (\Exception $e) {
-            $this->exceptionAtTheBeginning = $e;
+            $this->exceptionAtTheBeginning = new PlatformException("Something went wrong. Please try again later.",
+                PlatformException::ERROR_DB, $e);
         }
     
     }

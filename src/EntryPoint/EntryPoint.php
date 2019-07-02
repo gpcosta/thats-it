@@ -48,6 +48,7 @@ class EntryPoint
 	}
     
     /**
+     * @throws ClientException
      * @throws PlatformException
      * @throws \Exception
      */
@@ -59,6 +60,13 @@ class EntryPoint
         
         try {
             $controllerToCall = new $info['controller']($this->request, $this->routes, $this->logger);
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (PlatformException $e) {
+            throw $e;
+        } catch (\PDOException $e) {
+            throw new PlatformException("There was a problem connecting to DB. ".
+                "Please verify if config/database.php has the correct info.", PlatformException::ERROR_DB, $e);
         } catch (\Exception $e) {
             throw new PlatformException("The requested controller (".$info['controller'].") was not found.",
                 PlatformException::ERROR_NOT_FOUND_DANGER, $e);
@@ -66,6 +74,10 @@ class EntryPoint
         
         try {
             $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (PlatformException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new PlatformException("The function requested (".$info['function'].") was not found ".
                 "or has not defined the correct parameters.", PlatformException::ERROR_NOT_FOUND_DANGER, $e);
