@@ -79,9 +79,9 @@ class Door
             $entryPoint->callController();
         } catch (ClientException $e) {
             $error = $e->getMessage();
-            if ($e->getCode() == 404) self::sendViewErrorMessage('/View/Error/error404', 404, $e->getMessage());
-            else if ($e->getCode() == 405) self::sendViewErrorMessage('/View/Error/error405', 405, $e->getMessage());
-            else self::sendViewErrorMessage(Folder::getSourceFolder().'/View/Error/error500', 500, $e->getMessage());
+            if ($e->getCode() == 404) self::sendViewErrorMessage('Error/error404', 404, $e->getMessage());
+            else if ($e->getCode() == 405) self::sendViewErrorMessage('Error/error405', 405, $e->getMessage());
+            else self::sendViewErrorMessage('Error/error500', 500, $e->getMessage());
             die;
         } catch (PlatformException | \ErrorException | \Exception $e) {
             if ($environment === 'production') {
