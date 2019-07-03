@@ -42,15 +42,22 @@ class Database
             $this->exceptionAtTheBeginning = null;
             
             if (isset($config['host'], $config['port'], $config['dbName'], $config['password'])) {
-                // PDO::ATTR_PERSISTENT = true means that the connection established will
-                // be cached and re-used when another script requests a connection using
-                // the same credentials
                 $this->pdo = new PDO('mysql:host=' . $config['host'] . ';port=' . $config['port'] .
                     ';dbname=' . $config['dbName'] . ';charset=' . $config['encoding'], $config['user'], $config['password'], array(
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_PERSISTENT => true,
-                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES '" . $config['encoding'] . "' COLLATE '" . $config['collation'] . "'"
-                ));
+                        // all errors will cause a PDOException
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        // PDO::ATTR_PERSISTENT = true means that the connection established will
+                        // be cached and re-used when another script requests a connection using
+                        // the same credentials
+                        PDO::ATTR_PERSISTENT => true,
+                        // default fetch mode is set to PDO::FETCH_ASSOC
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        // emulation will be done by MySQL and not by PDO library
+                        PDO::ATTR_EMULATE_PREPARES => false,
+                        // set encoding and collation for the connection
+                        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES '" . $config['encoding'] . "' COLLATE '" . $config['collation'] . "'"
+                    )
+                );
             }
         } catch (PlatformException $e) {
             throw $e;
