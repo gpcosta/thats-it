@@ -18,12 +18,39 @@ namespace ThatsIt\Response;
  */
 abstract class HttpResponse
 {
+    /**
+     * @var string
+     */
     protected $version = '1.1';
+    
+    /**
+     * @var int
+     */
     protected $statusCode = 200;
+    
+    /**
+     * @var string
+     */
     protected $statusText = 'OK';
+    
+    /**
+     * @var array[name => array[value1, value2, ...]]
+     */
     protected $headers = [];
+    
+    /**
+     * @var array[name => value]
+     */
     protected $cookies = [];
     
+    /**
+     * @var array[name => value]
+     */
+    protected $variables = [];
+    
+    /**
+     * @var array
+     */
     private $statusTexts = [
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -184,6 +211,23 @@ abstract class HttpResponse
         $cookie->setValue('');
         $cookie->setMaxAge(-1);
         $this->cookies[$cookie->getName()] = $cookie;
+    }
+    
+    /**
+     * @param string $name
+     * @param $value
+     */
+    public function addVariable(string $name, $value): void
+    {
+        $this->variables[$name] = $value;
+    }
+    
+    /**
+     * @param array $variables
+     */
+    public function setVariables(array $variables): void
+    {
+        $this->variables = $variables;
     }
     
     /**

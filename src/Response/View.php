@@ -18,16 +18,10 @@ use ThatsIt\Folder\Folder;
  */
 class View extends HttpResponse
 {
-    
     /**
      * @var string
      */
     private $viewToShow;
-    
-    /**
-     * @var array[name => value]
-     */
-    private $variables;
     
     /**
      * @var array
@@ -41,24 +35,6 @@ class View extends HttpResponse
     public function __construct(string $viewToShow)
     {
         $this->viewToShow = $viewToShow;
-        $this->variables = array();
-    }
-    
-    /**
-     * @param string $name
-     * @param $value
-     */
-    public function addVariable(string $name, $value): void
-    {
-        $this->variables[$name] = $value;
-    }
-    
-    /**
-     * @param array $variables
-     */
-    public function setVariables(array $variables): void
-    {
-        $this->variables = $variables;
     }
     
     /**

@@ -15,33 +15,11 @@ namespace ThatsIt\Response;
 class JsonResponse extends HttpResponse
 {
     /**
-     * @var array[name => value]
-     */
-    private $variables;
-    
-    /**
      * JsonResponse constructor.
      */
     public function __construct()
     {
         $this->setHeader('Content-Type', 'application/json;charset=utf-8');
-    }
-    
-    /**
-     * @param string $name
-     * @param $value
-     */
-    public function addVariable(string $name, $value): void
-    {
-        $this->variables[$name] = $value;
-    }
-    
-    /**
-     * @param array $variables
-     */
-    public function setVariables(array $variables): void
-    {
-        $this->variables = $variables;
     }
     
     /**

@@ -35,9 +35,42 @@ class RedirectResponse extends HttpResponse
     }
     
     /**
+     * Add a variable to url (will allow to change the url when variables are added)
+     *
+     * @param string $name
+     * @param $value
+     */
+    public function addVariable(string $name, $value): void
+    {
+        parent::addVariable($name, $value);
+        $this->setHeader('Location', $this->getNewUrl());
+    }
+    
+    /**
+     * Set variables to url
+     *
+     * @param array $variables
+     */
+    public function setVariables(array $variables): void
+    {
+        parent::setVariables($variables);
+        $this->setHeader('Location', $this->getNewUrl());
+    }
+    
+    /**
      * There is no content in this RedirectResponse
      *
      * @return string
      */
     public function getContent(): string { return ""; }
+    
+    /**
+     * Return the url formed with the addition of the current variables
+     *
+     * @return string
+     */
+    private function getNewUrl(): string
+    {
+        return (strpos($this->url, '?') !== false ? $this->url : $this->url.'?').http_build_query($this->variables);
+    }
 }

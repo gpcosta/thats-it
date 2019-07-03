@@ -29,7 +29,7 @@ class SendResponse
     }
     
     /**
-     * send json response
+     * send http response
      */
     public function send(): void
     {
