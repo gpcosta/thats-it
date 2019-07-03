@@ -81,12 +81,13 @@ class CurlRequest
      * @throws PlatformException
      */
     public function __construct(string $url, string $encoding, string $method,
-                                 array $postFields, int $port = 80, int $maxRedirections = 10, int $timeout = 30,
-                                 string $httpVersion = "CURL_HTTP_VERSION_1_1",
-                                 array $httpHeader = [
-                                     "Content-Type: application/x-www-form-urlencoded; charset=utf-8",
-                                     "cache-control: no-cache"
-                                 ], string $userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) ".
+                                array $postFields, array $httpHeader = [
+                                    "Content-Type: application/x-www-form-urlencoded; charset=utf-8",
+                                    "cache-control: no-cache"
+                                ],
+                                int $port = 80, int $maxRedirections = 10, int $timeout = 30,
+                                string $httpVersion = "CURL_HTTP_VERSION_1_1",
+                                string $userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) ".
                                     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36")
     {
         $this->url = $url;
@@ -134,7 +135,10 @@ class CurlRequest
         curl_close($curl);
         
         if ($error) {
-            throw new \Exception("There was an error in a CURL request. Error: ".$error, 500);
+            throw new PlatformException(
+                "There was an error in CURL request. Error: ".$error,
+                PlatformException::ERROR_CURL_REQUEST
+            );
         } else {
             return $response;
         }

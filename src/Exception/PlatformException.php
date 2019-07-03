@@ -42,6 +42,11 @@ class PlatformException extends \Exception
     const ERROR_CONFIG_FILE_MISSING = 4;
     
     /**
+     * when a curl request fails
+     */
+    const ERROR_CURL_REQUEST = 5;
+    
+    /**
      * PlatformException constructor.
      * @param string $message
      * @param int $code
