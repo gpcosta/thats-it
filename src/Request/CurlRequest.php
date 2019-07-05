@@ -17,6 +17,16 @@ use ThatsIt\Exception\PlatformException;
 class CurlRequest
 {
     /**
+     * $postFields to query string through http_build_query()
+     */
+    const CURL_POST_FIELDS_TO_QUERY = 1;
+    
+    /**
+     * $postFields to json through json_encode()
+     */
+    const CURL_POST_FIELDS_TO_JSON = 2;
+    
+    /**
      * @var string
      */
     private $url;
@@ -103,20 +113,41 @@ class CurlRequest
         }
         
         $this->method = $method;
-        $this->postFields = http_build_query($postFields);
+        $this->postFields = $postFields;
         $this->httpHeader = $httpHeader;
         $this->userAgent = $userAgent;
     }
     
     /**
+     * Prepare $postFields to the requested format
+     *
+     * @param $toFormat
+     * @return CurlRequest
+     */
+    public function preparePostFields($toFormat): CurlRequest
+    {
+        switch ($toFormat) {
+            case self::CURL_POST_FIELDS_TO_JSON:
+                $this->postFields = json_encode($this->postFields, JSON_PRETTY_PRINT);
+                break;
+            case self::CURL_POST_FIELDS_TO_QUERY:
+            default:
+                $this->postFields = http_build_query($this->postFields);
+                break;
+        }
+        return $this;
+    }
+    
+    /**
      * @return string
-     * @throws \Exception
+     * @throws PlatformException
      */
     public function send(): string
     {
         $curl = curl_init();
         
         curl_setopt($curl, CURLOPT_URL, $this->url);
+        curl_setopt($curl, CURLOPT_HEADER, true); // we want headers
         curl_setopt($curl, CURLOPT_PORT, $this->port);
         curl_setopt($curl, CURLOPT_ENCODING, $this->encoding);
         curl_setopt($curl, CURLOPT_MAXREDIRS, $this->maxRedirections);
@@ -131,12 +162,19 @@ class CurlRequest
         
         $response = curl_exec($curl);
         $error = curl_error($curl);
+    
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
         curl_close($curl);
         
         if ($error) {
             throw new PlatformException(
                 "There was an error in CURL request. Error: ".$error,
+                PlatformException::ERROR_CURL_REQUEST
+            );
+        } else if ($httpCode >= 400) {
+            throw new PlatformException(
+                "The CURL request was not successful. Status code: ".$httpCode,
                 PlatformException::ERROR_CURL_REQUEST
             );
         } else {
