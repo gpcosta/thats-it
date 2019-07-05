@@ -133,7 +133,8 @@ class ValidateController
      */
     private function hasDefault(\ReflectionParameter $myParameter): bool
     {
-        return isset($this->route['parameters'][$myParameter->getName()]['default']);
+        return $this->route['parameters'][$myParameter->getName()]
+            && array_key_exists('default', $this->route['parameters'][$myParameter->getName()]);
     }
     
     /**
