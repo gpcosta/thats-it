@@ -61,10 +61,9 @@ class ValidateController
     
     /**
      * @param array $givenParameters
-     * @param string $controllerName
-     * @param string $functionName
      * @return array
-     * @throws \Exception
+     * @throws ClientException
+     * @throws PlatformException
      */
     public function getCorrectParameters(array $givenParameters): array
     {

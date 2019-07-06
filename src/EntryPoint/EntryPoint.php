@@ -5,13 +5,16 @@ namespace ThatsIt\EntryPoint;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
+use ThatsIt\Configurations\Configurations;
 use ThatsIt\Controller\ValidateController;
 use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\HttpResponse;
+use ThatsIt\Response\JsonResponse;
 use ThatsIt\Response\SendResponse;
+use ThatsIt\Response\View;
 
 /**
  * Class EntryPoint
@@ -30,6 +33,16 @@ class EntryPoint
 	private $routes;
     
     /**
+     * @var array
+     */
+	private $generalConfig;
+    
+    /**
+     * @var string
+     */
+	private $environment;
+    
+    /**
      * @var Logger
      */
 	private $logger;
@@ -38,59 +51,74 @@ class EntryPoint
      * EntryPoint constructor.
      * @param HttpRequest $request
      * @param array $routes
-     * @param Logger $logger
+     * @param array $generalConfig
+     * @param string $environment
      */
-	public function __construct(HttpRequest $request, array $routes, Logger $logger)
+	public function __construct(HttpRequest $request, array $routes, array $generalConfig, string $environment)
 	{
 	    $this->request = $request;
 	    $this->routes = $routes;
-	    $this->logger = $logger;
+        $this->generalConfig = $generalConfig;
+        $this->environment = $environment;
+        
+        try {
+            $this->logger = new Logger('ThatsIt');
+        } catch (\Exception $e) {
+            if ($this->environment == 'production') {
+                $this->sendErrorMessage(
+                    500,
+                    "The service that you are trying to contact cannot fulfill your request at the moment.",
+                    'Error/error500'
+                );
+            }
+        }
 	}
     
     /**
-     * @throws ClientException
      * @throws PlatformException
+     * @throws \PDOException
      * @throws \Exception
      */
 	public function callController()
 	{
-        $info = $this->getControllerAndFunction();
-        $validateController = new ValidateController($this->findRoute($info['controller'], $info['function']));
-        $parameters = $validateController->getCorrectParameters(array_merge($this->request->getParameters(), $info['vars']));
-        
         try {
+            $info = $this->getControllerAndFunction();
+            $validateController = new ValidateController($this->findRoute($info['controller'], $info['function']));
+            $parameters = $validateController->getCorrectParameters(array_merge($this->request->getParameters(), $info['vars']));
             $controllerToCall = new $info['controller']($this->request, $this->routes, $this->logger);
-        } catch (ClientException $e) {
-            throw $e;
-        } catch (PlatformException $e) {
-            throw $e;
-        } catch (\PDOException $e) {
-            throw new PlatformException("There was a problem connecting to DB. ".
-                "Please verify if config/database.php has the correct info.", PlatformException::ERROR_DB, $e);
-        } catch (\Exception $e) {
-            throw new PlatformException("The requested controller (".$info['controller'].") was not found.",
-                PlatformException::ERROR_NOT_FOUND_DANGER, $e);
-        }
-        
-        try {
             $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
+    
+            if ($response instanceof HttpResponse) {
+                $send = new SendResponse($response);
+                $send->send();
+            } else {
+                throw new PlatformException(
+                    "Controller has to return a class that implements ThatsIt\\Response\\HttpResponse class.",
+                    PlatformException::ERROR_RESPONSE
+                );
+            }
         } catch (ClientException $e) {
-            throw $e;
-        } catch (PlatformException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new PlatformException("The function requested (".$info['function'].") was not found ".
-                "or has not defined the correct parameters.", PlatformException::ERROR_NOT_FOUND_DANGER, $e);
-        }
-        
-        if ($response instanceof HttpResponse) {
-            $send = new SendResponse($response);
-            $send->send();
-        } else {
-            throw new PlatformException(
-                "Controller has to return a class that implements ThatsIt\\Response\\HttpResponse class.",
-                PlatformException::ERROR_RESPONSE
-            );
+            $this->logger->addWarning($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
+            if ($e->getCode() == 404) $this->sendErrorMessage('Error/error404', 404, $e->getMessage());
+            else if ($e->getCode() == 405) $this->sendErrorMessage('Error/error405', 405, $e->getMessage());
+            else $this->sendErrorMessage('Error/error500', 500, $e->getMessage());
+        } catch (PlatformException | \PDOException | \Exception $e) {
+            if ($e instanceof PlatformException)
+                $this->logger->addError($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
+            else if ($e instanceof \PDOException)
+                $this->logger->addError($e->getMessage(), ["code" => PlatformException::ERROR_DB, "exception" => $e]);
+            else
+                $this->logger->addEmergency($e->getMessage(), ["code" => PlatformException::ERROR_UNDEFINED, "exception" => $e]);
+            
+            if ($this->environment == 'production') {
+                $this->sendErrorMessage(
+                    'Error/error500',
+                    500,
+                    "Something wrong happened. Please try again."
+                );
+            } else {
+                throw $e;
+            }
         }
 	}
     
@@ -153,5 +181,14 @@ class EntryPoint
                 return $route;
         }
         return null;
+    }
+    
+    private function sendErrorMessage(int $statusCode, string $error, string $page): void
+    {
+        $response = new View($page);
+        $response->setStatusCode($statusCode);
+        $response->addVariable('error', $error);
+        $send = new SendResponse($response);
+        $send->send();
     }
 }

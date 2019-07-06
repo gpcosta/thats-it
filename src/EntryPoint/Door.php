@@ -43,19 +43,10 @@ class Door
             }
             throw new \ErrorException($message, 500, $severity, $file, $line);
         });
-    
-        $logger = null;
-        try {
-            $logger = new Logger('ThatsIt');
-        } catch (\Exception $e) {
-            self::sendJsonErrorMessage(500, [
-                "error" => "The service that you are trying to contact cannot fulfill your request at the moment."
-            ]);
-        }
         
-        $environment = 'production';
+        $generalConfig = Configurations::getGeneralConfig();
+        $environment = $generalConfig['environment'];
         try {
-            $environment = Configurations::getGeneralConfig()['environment'];
             if ($environment !== 'production') {
                 /**
                  * Register the error handler
@@ -65,39 +56,16 @@ class Door
                 $whoops->register();
             }
         } catch (\Exception $e) {
-            self::sendJsonErrorMessage(500, [
-                "error" => "filp/whoops cannot load."
-            ]);
+            // $whoops never will be needed in production, just for debug purpose
         }
     
-        try {
-            $entryPoint = new EntryPoint(
-                new HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER, file_get_contents('php://input')),
-                Configurations::getRoutesConfig(),
-                $logger
-            );
-            $entryPoint->callController();
-        } catch (ClientException $e) {
-            if ($e->getCode() == 404) self::sendViewErrorMessage('Error/error404', 404, $e->getMessage());
-            else if ($e->getCode() == 405) self::sendViewErrorMessage('Error/error405', 405, $e->getMessage());
-            else self::sendViewErrorMessage('Error/error500', 500, $e->getMessage());
-            die;
-        } catch (PlatformException | \ErrorException | \Exception $e) {
-            if ($environment === 'production') {
-                self::sendJsonErrorMessage(500, [
-                    "error" => "The service that you are trying to contact cannot fulfill your request at the moment."
-                ]);
-                if ($e instanceof PlatformException)
-                    $logger->addError($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
-                else if ($e instanceof \ErrorException)
-                    $logger->addEmergency($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
-                else
-                    $logger->addAlert($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
-            } else {
-                // catch by $whoops
-                throw $e;
-            }
-        }
+        $entryPoint = new EntryPoint(
+            new HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER, file_get_contents('php://input')),
+            Configurations::getRoutesConfig(),
+            $generalConfig,
+            $environment
+        );
+        $entryPoint->callController();
     }
     
     /**

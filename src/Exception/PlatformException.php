@@ -17,6 +17,11 @@ use Throwable;
 class PlatformException extends \Exception
 {
     /**
+     * for undefined errors
+     */
+    const ERROR_UNDEFINED = 0;
+    
+    /**
      * some resource was not found, but probably was caused by going to a wrong url
      */
     const ERROR_NOT_FOUND_SOFT = 1;
