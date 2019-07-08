@@ -5,6 +5,7 @@ namespace ThatsIt\Controller;
 use \PDO;
 use ThatsIt\Database\Database;
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\RedirectResponse;
@@ -81,26 +82,5 @@ abstract class AbstractController
 	protected function getPDO() : PDO
     {
 	    return $this->db->getPDO();
-    }
-    
-    /**
-     * Redirect to route with that $routeName (after redirect, the process die)
-     *
-     * @param string $routeName
-     * @param array $params
-     * @return RedirectResponse
-     * @throws PlatformException
-     */
-    protected function redirectToRoute(string $routeName, array $params = array()): RedirectResponse
-    {
-        if (isset($this->getRoutes()[$routeName]['path'])) {
-            $url = $this->getRoutes()[$routeName]['path'].(count($params) > 0 ? "?".http_build_query($params) : "");
-            return new RedirectResponse($url, 302);
-        } else {
-            throw new PlatformException(
-                "There are no possible redirect for ".$routeName.".",
-                PlatformException::ERROR_NOT_FOUND_DANGER
-            );
-        }
     }
 }

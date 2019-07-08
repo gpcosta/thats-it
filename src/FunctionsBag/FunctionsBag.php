@@ -21,12 +21,12 @@ class FunctionsBag
 {
     /**
      * @param string $name
-     * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
      * @param array $variables[name => value]
+     * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
      * @return string
      * @throws PlatformException
      */
-    public static function getUrl(string $name, bool $withOptional = false, array $variables = array()): string
+    public static function getUrl(string $name, array $variables = [], bool $withOptional = false): string
     {
         static $routes;
         
