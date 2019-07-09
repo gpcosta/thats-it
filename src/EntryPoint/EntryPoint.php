@@ -99,9 +99,9 @@ class EntryPoint
             }
         } catch (ClientException $e) {
             $this->logger->addWarning($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
-            if ($e->getCode() == 404) $this->sendErrorMessage('Error/error404', 404, $e->getMessage());
-            else if ($e->getCode() == 405) $this->sendErrorMessage('Error/error405', 405, $e->getMessage());
-            else $this->sendErrorMessage('Error/error500', 500, $e->getMessage());
+            if ($e->getCode() == 404) $this->sendErrorMessage(404, $e->getMessage(), 'Error/error404');
+            else if ($e->getCode() == 405) $this->sendErrorMessage(405, $e->getMessage(), 'Error/error405');
+            else $this->sendErrorMessage(500, $e->getMessage(), 'Error/error500');
         } catch (PlatformException | \PDOException | \Exception $e) {
             if ($e instanceof PlatformException)
                 $this->logger->addError($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
@@ -112,9 +112,9 @@ class EntryPoint
             
             if ($this->environment == 'production') {
                 $this->sendErrorMessage(
-                    'Error/error500',
                     500,
-                    "Something wrong happened. Please try again."
+                    "Something wrong happened. Please try again.",
+                    'Error/error500'
                 );
             } else {
                 throw $e;
