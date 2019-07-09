@@ -271,7 +271,11 @@ class HttpRequest
      */
     public function getMethod()
     {
-        return $this->getServerVariable('REQUEST_METHOD');
+        $method = $this->getServerVariable('REQUEST_METHOD');
+        if ($this->getParameter("_method")) {
+            $method = strtoupper($this->getParameter("_method"));
+        }
+        return $method;
     }
     
     /**
