@@ -70,6 +70,9 @@ class ValidateController
         $correctParameters = array();
     
         $parametersInRealController = $this->getReflectionMethod()->getParameters();
+        
+        $this->allParametersAreInRouter($parametersInRealController);
+        
         foreach ($parametersInRealController as $key => $parameter) {
             $givenParameter = isset($givenParameters[$parameter->getName()]) ?
                 $givenParameters[$parameter->getName()] :
@@ -117,6 +120,24 @@ class ValidateController
     }
     
     /**
+     * @param array $parametersInRealController(\ReflectionParameter)
+     * @throws PlatformException
+     */
+    private function allParametersAreInRouter(array $parametersInRealController): void
+    {
+        foreach ($parametersInRealController as $controllerParameter) {
+            if (!array_key_exists($controllerParameter, $this->route["parameters"])) {
+                throw new PlatformException(
+                    "Controller parameters are incompatible with Route parameters.",
+                    PlatformException::ERROR_NOT_FOUND_DANGER
+                );
+            }
+        }
+    }
+    
+    /**
+     * if the current parameter ($myParameter) is provided by the user
+     *
      * @param \ReflectionParameter $myParameter
      * @param array $givenParameters
      * @return bool
