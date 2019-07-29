@@ -82,16 +82,18 @@ class CurlRequest
      * @param string $encoding
      * @param string $method
      * @param array $postFields
+     * @param int $postFieldsType (can get any constant that starts with CURL_POST_FIELDS_TO_*)
+     * @param array $httpHeader
      * @param int $port
      * @param int $maxRedirections
      * @param int $timeout
      * @param string $httpVersion
-     * @param array $httpHeader
      * @param string $userAgent
      * @throws PlatformException
      */
     public function __construct(string $url, string $encoding, string $method,
-                                array $postFields, array $httpHeader = [
+                                array $postFields, int $postFieldsType = self::CURL_POST_FIELDS_TO_QUERY,
+                                array $httpHeader = [
                                     "Content-Type: application/x-www-form-urlencoded; charset=utf-8",
                                     "cache-control: no-cache"
                                 ],
@@ -113,29 +115,9 @@ class CurlRequest
         }
         
         $this->method = $method;
-        $this->postFields = $postFields;
+        $this->postFields = $this->preparePostFields($postFields, $postFieldsType);
         $this->httpHeader = $httpHeader;
         $this->userAgent = $userAgent;
-    }
-    
-    /**
-     * Prepare $postFields to the requested format
-     *
-     * @param $toFormat
-     * @return CurlRequest
-     */
-    public function preparePostFields($toFormat): CurlRequest
-    {
-        switch ($toFormat) {
-            case self::CURL_POST_FIELDS_TO_JSON:
-                $this->postFields = json_encode($this->postFields, JSON_PRETTY_PRINT);
-                break;
-            case self::CURL_POST_FIELDS_TO_QUERY:
-            default:
-                $this->postFields = http_build_query($this->postFields);
-                break;
-        }
-        return $this;
     }
     
     /**
@@ -177,8 +159,30 @@ class CurlRequest
                 "The CURL request was not successful. Status code: ".$httpCode,
                 PlatformException::ERROR_CURL_REQUEST
             );
-        } else {
-            return $response;
         }
+        
+        return $response;
+    }
+    
+    /**
+     * Prepare $postFields to the requested format
+     *
+     * @param $postFields
+     * @param $toFormat
+     * @return CurlRequest
+     */
+    private function preparePostFields($postFields, $toFormat): CurlRequest
+    {
+        switch ($toFormat) {
+            case self::CURL_POST_FIELDS_TO_JSON:
+                $this->postFields = json_encode($postFields, JSON_PRETTY_PRINT);
+                break;
+            // query string is the default (x-www-form-urlencoded)
+            case self::CURL_POST_FIELDS_TO_QUERY:
+            default:
+                $this->postFields = http_build_query($postFields);
+                break;
+        }
+        return $this;
     }
 }
