@@ -279,6 +279,17 @@ class HttpRequest
     }
     
     /**
+     * Return the current host that comes in $_SERVER variable
+     *
+     * @return mixed
+     * @throws MissingRequestMetaVariableException
+     */
+    public function getHost()
+    {
+        return $this->getServerVariable('HTTP_HOST');
+    }
+    
+    /**
      * Contents of the Accept: header from the current request, if there is one.
      *
      * @return string
