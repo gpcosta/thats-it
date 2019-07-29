@@ -28,12 +28,13 @@ class Database
     
     /**
      * Database constructor.
+     * @param string|null $configDBPath
      * @throws PlatformException
      */
-    public function __construct()
+    public function __construct(string $configDBPath = null)
     {
         try {
-            $config = Configurations::getDatabaseConfig();
+            $config = Configurations::getDatabaseConfig($configDBPath);
         
             if (!isset($config['encoding'])) $config['encoding'] = "utf8mb4";
             if (!isset($config['collation'])) $config['collation'] = "utf8mb4_unicode_ci";

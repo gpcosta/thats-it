@@ -42,41 +42,47 @@ class Configurations
     }
     
     /**
+     * @param string|null $generalConfigPath
      * @return array
      * @throws PlatformException
      */
-    public static function getGeneralConfig(): array
+    public static function getGeneralConfig(string $generalConfigPath = null): array
     {
-        if (!is_file(self::getGeneralConfigFile())) {
+        if ($generalConfigPath === null) $generalConfigPath = self::getGeneralConfigFile();
+        if (!is_file($generalConfigPath)) {
             throw new PlatformException("No general config file. It's missing the file config/config.php.",
                 PlatformException::ERROR_CONFIG_FILE_MISSING);
         }
-        return require(self::getGeneralConfigFile());
+        return require($generalConfigPath);
     }
     
     /**
+     * @param string|null $configDBPath
      * @return array
      * @throws PlatformException
      */
-    public static function getDatabaseConfig(): array
+    public static function getDatabaseConfig(string $configDBPath = null): array
     {
-        if (!is_file(self::getDatabaseConfigFile())) {
+        if ($configDBPath === null) $configDBPath = self::getDatabaseConfigFile();
+        if (!is_file($configDBPath)) {
             throw new PlatformException("No database file. It's missing the file config/database.php.",
                 PlatformException::ERROR_CONFIG_FILE_MISSING);
         }
-        return require(self::getDatabaseConfigFile());
+        return require($configDBPath);
     }
     
     /**
+     * @param string|null $routesPath
      * @return array
      * @throws PlatformException
      */
-    public static function getRoutesConfig(): array
+    public static function getRoutesConfig(string $routesPath = null): array
     {
-        if (!is_file(self::getRoutesConfigFile())) {
+        if ($routesPath === null) $routesPath = self::getRoutesConfigFile();
+        if (!is_file($routesPath)) {
             throw new PlatformException("No routes file. It's missing the file config/router.php.",
                 PlatformException::ERROR_CONFIG_FILE_MISSING);
         }
-        return require(self::getRoutesConfigFile());
+        return require($routesPath);
     }
 }

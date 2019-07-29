@@ -20,6 +20,19 @@ use ThatsIt\Exception\PlatformException;
 class FunctionsBag
 {
     /**
+     * @var null|string
+     */
+    private static $routesPath = null;
+    
+    /**
+     * @param string $routesPath
+     */
+    public static function setRoutesPath(string $routesPath): void
+    {
+        self::$routesPath = $routesPath;
+    }
+    
+    /**
      * @param string $name
      * @param array $variables[name => value]
      * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
@@ -33,7 +46,7 @@ class FunctionsBag
         static $routes;
         
         // just to load routes once
-        if (!$routes) $routes = Configurations::getRoutesConfig();
+        if (!$routes) $routes = Configurations::getRoutesConfig(self::$routesPath);
         
         if (!isset($routes[$name])) {
             throw new PlatformException("There are no url for '".$name."'",
