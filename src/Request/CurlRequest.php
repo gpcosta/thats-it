@@ -138,6 +138,7 @@ class CurlRequest
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $this->postFields);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $this->httpHeader);
+        curl_setopt($curl, CURLOPT_CAINFO, 'cacert.pem');
         
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         
