@@ -67,7 +67,7 @@ class FunctionsBag
         foreach ($alreadyUsedVariablesInPath as $variableName) unset($variables[$variableName]);
         
         // will add get variables (this variables are the remain ones from $variables that were not set in $path already)
-        $path .= "?".http_build_query($variables);
+        if (count($variables) > 0) $path .= "?".http_build_query($variables);
         
         if ($withOptional) {
             // if so removes just parenthesis

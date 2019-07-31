@@ -126,8 +126,8 @@ class ValidateController
     private function allParametersAreInRouter(array $parametersInRealController): void
     {
         foreach ($parametersInRealController as $controllerParameter) {
-            if ($controllerParameter instanceof \ReflectionParameter
-                && !array_key_exists($controllerParameter->getName(), $this->route["parameters"])) {
+            if (!($controllerParameter instanceof \ReflectionParameter)
+                || !array_key_exists($controllerParameter->getName(), $this->route["parameters"])) {
                 throw new PlatformException(
                     "Controller parameters are incompatible with Route parameters.",
                     PlatformException::ERROR_NOT_FOUND_DANGER

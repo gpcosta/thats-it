@@ -138,7 +138,13 @@ class CurlRequest
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $this->postFields);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $this->httpHeader);
-        curl_setopt($curl, CURLOPT_CAINFO, 'cacert.pem');
+        
+        /* to allow https connections */
+        /*curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,1);
+        curl_setopt($curl, CURLOPT_CAINFO, __DIR__.'/cacert.pem');
+        curl_setopt($curl, CURLOPT_SSLVERSION, 'all');
+        curl_setopt($curl, CURLOPT_CAPATH,__DIR__.'cacert.pem');*/
         
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         
