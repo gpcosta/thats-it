@@ -129,7 +129,6 @@ class CurlRequest
         $curl = curl_init();
         
         curl_setopt($curl, CURLOPT_URL, $this->url);
-        curl_setopt($curl, CURLOPT_HEADER, true); // we want headers
         curl_setopt($curl, CURLOPT_PORT, $this->port);
         curl_setopt($curl, CURLOPT_ENCODING, $this->encoding);
         curl_setopt($curl, CURLOPT_MAXREDIRS, $this->maxRedirections);
@@ -169,20 +168,20 @@ class CurlRequest
      *
      * @param $postFields
      * @param $toFormat
-     * @return CurlRequest
+     * @return string
      */
-    private function preparePostFields($postFields, $toFormat): CurlRequest
+    private function preparePostFields($postFields, $toFormat): string
     {
         switch ($toFormat) {
             case self::CURL_POST_FIELDS_TO_JSON:
-                $this->postFields = json_encode($postFields, JSON_PRETTY_PRINT);
+                $postFields = json_encode($postFields, JSON_PRETTY_PRINT);
                 break;
             // query string is the default (x-www-form-urlencoded)
             case self::CURL_POST_FIELDS_TO_QUERY:
             default:
-                $this->postFields = http_build_query($postFields);
+                $postFields = http_build_query($postFields);
                 break;
         }
-        return $this;
+        return $postFields;
     }
 }
