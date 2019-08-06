@@ -59,8 +59,11 @@ class FunctionsBag
         $path = $routes[$name]['path'];
         // will substitute all variables for their value
         foreach ($variables as $name => $value) {
-            $path = preg_replace("/\{".$name."(\:.*){0,1}\}/U", $value, $path);
-            $alreadyUsedVariablesInPath[] = $name;
+            // limit: -1 is the same as no limit; $count will no how many replaces happened
+            $path = preg_replace("/\{".$name."(\:.*){0,1}\}/U", $value, $path, -1, $count);
+            // if any replace happened, this variable is already used
+            // if not, this variable should be added to path as a GET parameter
+            if ($count) $alreadyUsedVariablesInPath[] = $name;
         }
         
         // remove all variables already set in url (this step was not made in last foreach just as a safety measure)
