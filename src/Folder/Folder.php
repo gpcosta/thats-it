@@ -43,6 +43,14 @@ class Folder
     /**
      * @return string
      */
+    public static function getPublicFolder(): string
+    {
+        return self::$indexPath;
+    }
+    
+    /**
+     * @return string
+     */
     public static function getGeneralConfigFolder(): string
     {
         return self::$indexPath.'/../../config';
