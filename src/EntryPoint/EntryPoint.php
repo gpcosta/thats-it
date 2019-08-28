@@ -83,9 +83,17 @@ class EntryPoint
 	{
         try {
             $info = $this->getControllerAndFunction();
-            $validateController = new ValidateController($this->findRoute($info['controller'], $info['function']));
-            $parameters = $validateController->getCorrectParameters(array_merge($this->request->getParameters(), $info['vars']));
-            $controllerToCall = new $info['controller']($this->request, $this->routes, $this->logger);
+            $currentRoute = $this->findRoute($info['controller'], $info['function']);
+            if ($currentRoute === null) {
+                throw new PlatformException(
+                    "There is no such route.",
+                    PlatformException::ERROR_NOT_FOUND_DANGER
+                );
+            }
+            $givenParameters = array_merge($this->request->getParameters(), $info['vars']);
+            $validateController = new ValidateController($currentRoute);
+            $parameters = $validateController->getCorrectParameters($givenParameters);
+            $controllerToCall = new $info['controller']($this->request, $this->routes, $currentRoute, $this->logger);
             $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
     
             if ($response instanceof HttpResponse) {
@@ -176,9 +184,11 @@ class EntryPoint
      */
     private function findRoute(string $controllerName, string $functionName): ?array
     {
-        foreach ($this->routes as $route) {
-            if ($route['controller'] == $controllerName && $route['function'] == $functionName)
+        foreach ($this->routes as $routeName => $route) {
+            if ($route['controller'] == $controllerName && $route['function'] == $functionName) {
+                $route['routeName'] = $routeName;
                 return $route;
+            }
         }
         return null;
     }

@@ -32,6 +32,11 @@ abstract class AbstractController
 	private $routes;
     
     /**
+     * @var array
+     */
+    private $currentRoute;
+    
+    /**
      * @var Logger
      */
 	private $logger;
@@ -40,14 +45,17 @@ abstract class AbstractController
      * AbstractController constructor.
      * @param HttpRequest $request
      * @param array $routes
+     * @param array $currentRoute
      * @param Logger $logger
+     * @throws PlatformException
      * @throws \Exception
      */
-    public function __construct(HttpRequest $request, array $routes, Logger $logger)
+    public function __construct(HttpRequest $request, array $routes, array $currentRoute, Logger $logger)
 	{
 	    $this->db = new Database();
 		$this->request = $request;
 		$this->routes = $routes;
+        $this->currentRoute = $currentRoute;
 		$this->logger = $logger;
 	}
     
@@ -65,6 +73,14 @@ abstract class AbstractController
     protected function getRoutes(): array
     {
         return $this->routes;
+    }
+    
+    /**
+     * @return array
+     */
+    protected function getCurrentRoute(): array
+    {
+        return $this->currentRoute;
     }
     
     /**
