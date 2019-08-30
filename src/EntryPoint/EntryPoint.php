@@ -90,8 +90,8 @@ class EntryPoint
                     PlatformException::ERROR_NOT_FOUND_DANGER
                 );
             }
-            $givenParameters = array_merge($this->request->getParameters(), $info['vars']);
             $validateController = new ValidateController($currentRoute);
+            $givenParameters = $this->getSanitizedParameters(array_merge($this->request->getParameters(), $info['vars']));
             $parameters = $validateController->getCorrectParameters($givenParameters);
             $controllerToCall = new $info['controller']($this->request, $this->routes, $currentRoute, $this->logger);
             $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
@@ -175,6 +175,28 @@ class EntryPoint
         }
         
         return $toReturn;
+    }
+    
+    /**
+     * Sanitize a multidimensional array with htmlspecialchars
+     *
+     * IMPORTANT: if wants to revert the sanitization process,
+     *            you have to use htmlspecialchars_decode function
+     *
+     * Heavily inspired in https://gist.github.com/esthezia/5804445
+     *
+     * @param array $givenParameters
+     * @return array
+     */
+    private function getSanitizedParameters(array $givenParameters): array
+    {
+        foreach ($givenParameters as $key => $value) {
+            if (!is_array($value) && !is_object($value)) {
+                $givenParameters[$key] = htmlspecialchars(trim($value));
+            }
+            if (is_array($value)) $data[$key] = $this->getSanitizedParameters($value);
+        }
+        return $givenParameters;
     }
     
     /**
