@@ -93,11 +93,10 @@ class CurlRequest
      */
     public function __construct(string $url, string $encoding, string $method,
                                 array $postFields, int $postFieldsType = self::CURL_POST_FIELDS_TO_QUERY,
-                                array $httpHeader = [
+                                int $port = 80, array $httpHeader = [
                                     "Content-Type: application/x-www-form-urlencoded; charset=utf-8",
                                     "cache-control: no-cache"
-                                ],
-                                int $port = 80, int $maxRedirections = 10, int $timeout = 30,
+                                ], int $maxRedirections = 10, int $timeout = 30,
                                 string $httpVersion = "CURL_HTTP_VERSION_1_1",
                                 string $userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) ".
                                     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36")
