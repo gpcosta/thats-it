@@ -9,6 +9,7 @@ use ThatsIt\Configurations\Configurations;
 use ThatsIt\Controller\ValidateController;
 use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\HttpResponse;
@@ -82,6 +83,7 @@ class EntryPoint
 	public function callController()
 	{
         try {
+            FunctionsBag::setHttpHost($this->request->getHost());
             $info = $this->getControllerAndFunction();
             $currentRoute = $this->findRoute($info['controller'], $info['function']);
             if ($currentRoute === null) {

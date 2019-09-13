@@ -25,6 +25,11 @@ class FunctionsBag
     private static $routesPath = null;
     
     /**
+     * @var string
+     */
+    private static $httpHost = "";
+    
+    /**
      * @param string $routesPath
      */
     public static function setRoutesPath(string $routesPath): void
@@ -33,15 +38,23 @@ class FunctionsBag
     }
     
     /**
+     * @param string $httpHost
+     */
+    public static function setHttpHost(string $httpHost): void
+    {
+        self::$httpHost = $httpHost;
+    }
+    
+    /**
      * @param string $name
      * @param array $variables[name => value]
      * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
-     * @param string $httpHost (if something is passed, it will add in the beginning of url)
+     * @param bool $addHttpHost (if true, will add the domain to the url)
      * @return string
      * @throws PlatformException
      */
     public static function getUrl(string $name, array $variables = [], bool $withOptional = false,
-                                  string $httpHost = ""): string
+                                  bool $addHttpHost = false): string
     {
         static $routes;
         
@@ -87,7 +100,7 @@ class FunctionsBag
                 PlatformException::ERROR_NOT_FOUND_DANGER);
         }
         
-        if ($httpHost) $path = $httpHost.$path;
+        if ($addHttpHost) $path = self::$httpHost.$path;
         
         return $path;
     }

@@ -30,7 +30,6 @@ class Door
     /**
      * @param string $indexPath
      * @throws PlatformException
-     * @throws \ErrorException
      */
     public static function openDoor(string $indexPath): void
     {
