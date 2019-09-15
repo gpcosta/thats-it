@@ -95,7 +95,8 @@ class EntryPoint
             $validateController = new ValidateController($currentRoute);
             $givenParameters = $this->getSanitizedParameters(array_merge($this->request->getParameters(), $info['vars']));
             $parameters = $validateController->getCorrectParameters($givenParameters);
-            $controllerToCall = new $info['controller']($this->request, $this->routes, $currentRoute, $this->logger);
+            $controllerToCall = new $info['controller']($this->environment, $this->request,
+                $this->routes, $currentRoute, $this->logger);
             $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
     
             if ($response instanceof HttpResponse) {

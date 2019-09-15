@@ -16,10 +16,18 @@ use ThatsIt\Response\RedirectResponse;
  */
 abstract class AbstractController
 {
+    const ENVIRONMENT_DEV = "development";
+    const ENVIRONMENT_PROD = "production";
+    
     /**
      * @var Database
      */
 	private $db;
+    
+    /**
+     * @var string
+     */
+	private $environment;
     
     /**
      * @var HttpRequest
@@ -43,21 +51,34 @@ abstract class AbstractController
     
     /**
      * AbstractController constructor.
+     * @param string $environment
      * @param HttpRequest $request
      * @param array $routes
      * @param array $currentRoute
      * @param Logger $logger
      * @throws PlatformException
-     * @throws \Exception
      */
-    public function __construct(HttpRequest $request, array $routes, array $currentRoute, Logger $logger)
+    public function __construct(string $environment, HttpRequest $request, array $routes, array $currentRoute, Logger $logger)
 	{
 	    $this->db = new Database();
+        if (in_array($environment, [self::ENVIRONMENT_DEV, self::ENVIRONMENT_PROD])) {
+            $this->environment = $environment;
+        } else {
+            $this->environment = self::ENVIRONMENT_PROD;
+        }
 		$this->request = $request;
 		$this->routes = $routes;
         $this->currentRoute = $currentRoute;
 		$this->logger = $logger;
 	}
+    
+    /**
+     * @return string
+     */
+    protected function getEnvironment(): string
+    {
+        return $this->environment;
+    }
     
     /**
      * @return HttpRequest
