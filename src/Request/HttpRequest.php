@@ -290,7 +290,7 @@ class HttpRequest
         $host = $this->getServerVariable('HTTP_HOST');
         if ($withHttp) {
             // If the request was sent with HTTPS you will have a extra parameter in the $_SERVER superglobal - $_SERVER['HTTPS']
-            $httpOrHttps = "http".$host;
+            $httpOrHttps = "http";
             if (isset($_SERVER['HTTPS'])) $httpOrHttps .= "s";
             $host = $httpOrHttps."://".$host;
         }
