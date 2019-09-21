@@ -281,12 +281,20 @@ class HttpRequest
     /**
      * Return the current host that comes in $_SERVER variable
      *
-     * @return mixed
+     * @param bool $withHttp (string return will have the "prefix" http or https)
+     * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getHost()
+    public function getHost(bool $withHttp = true)
     {
-        return $this->getServerVariable('HTTP_HOST');
+        $host = $this->getServerVariable('HTTP_HOST');
+        if ($withHttp) {
+            // If the request was sent with HTTPS you will have a extra parameter in the $_SERVER superglobal - $_SERVER['HTTPS']
+            $httpOrHttps = "http".$host;
+            if (isset($_SERVER['HTTPS'])) $httpOrHttps .= "s";
+            $host = $httpOrHttps."://".$host;
+        }
+        return $host;
     }
     
     /**
