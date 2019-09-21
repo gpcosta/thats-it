@@ -30,11 +30,27 @@ class FunctionsBag
     private static $httpHost = "";
     
     /**
+     * @return null|string
+     */
+    public static function getRoutesPath(): ?string
+    {
+        return self::$routesPath;
+    }
+    
+    /**
      * @param string $routesPath
      */
     public static function setRoutesPath(string $routesPath): void
     {
         self::$routesPath = $routesPath;
+    }
+    
+    /**
+     * @return string
+     */
+    public static function getHttpHost(): string
+    {
+        return self::$httpHost;
     }
     
     /**
