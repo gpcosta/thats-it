@@ -63,7 +63,7 @@ class Cookie
      * @param string $path
      */
     public function __construct(string $name, $value = "", int $maxAge = 0, bool $httpOnly = true,
-                                bool $secure = false, $path = "/")
+                                bool $secure = true, $path = "/")
     {
         $this->name = $name;
         $this->value = (string) $value;
