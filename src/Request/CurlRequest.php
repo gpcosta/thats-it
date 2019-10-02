@@ -73,6 +73,9 @@ class CurlRequest
     
     /**
      * @var string
+     *
+     * If anything goes wrong, experiment the following user agent
+     * 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0'
      */
     private $userAgent;
     
@@ -98,7 +101,7 @@ class CurlRequest
                                     "cache-control: no-cache"
                                 ], int $maxRedirections = 10, int $timeout = 30,
                                 string $httpVersion = "CURL_HTTP_VERSION_1_1",
-                                string $userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) ".
+                                string $userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) ".
                                     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36")
     {
         $this->url = $url;
@@ -137,6 +140,10 @@ class CurlRequest
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $this->postFields);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $this->httpHeader);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_AUTOREFERER, true);
+        curl_setopt($curl, CURLOPT_USERAGENT, $this->userAgent);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         
         /* to allow https connections */
         /*curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
