@@ -11,8 +11,13 @@ namespace ThatsIt\Exception;
 use Throwable;
 
 /**
- * Class ClientException
+ * Class ClientException - everything that can be caused by the end-user (client)
  * @package ThatsIt\Exception
+ *
+ * @IMPORTANT: almost every exception raised in code working with this framework
+ *             should extends from this one. This exception will allow to access
+ *             to 404 and 405 error pages when these codes are sent to the client
+ *             and also allow to customize a message for 500 error page
  */
 class ClientException extends \Exception
 {
