@@ -103,10 +103,10 @@ class FunctionsBag
         
         if ($withOptional) {
             // if so removes just parenthesis
-            $path = preg_replace("/\(|\)/", "", $path);
+            $path = preg_replace("/\[|\]/", "", $path);
         } else {
             // else removes everything that is inside of parenthesis
-            $path = preg_replace("/\(.*\)/", "", $path);
+            $path = preg_replace("/\[.*\]/", "", $path);
         }
         
         // if there are some more variables to substitute, it will raise a exception
