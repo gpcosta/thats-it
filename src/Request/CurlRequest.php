@@ -80,18 +80,24 @@ class CurlRequest
     private $userAgent;
     
     /**
+     * @var string
+     */
+    private $filenameForCookies;
+    
+    /**
      * CurlRequest constructor.
      * @param string $url
      * @param string $encoding
      * @param string $method
      * @param array $postFields
      * @param int $postFieldsType (can get any constant that starts with CURL_POST_FIELDS_TO_*)
-     * @param array $httpHeader
      * @param int $port
+     * @param array $httpHeader
      * @param int $maxRedirections
      * @param int $timeout
      * @param string $httpVersion
      * @param string $userAgent
+     * @param string $filenameForCookies
      * @throws PlatformException
      */
     public function __construct(string $url, string $encoding, string $method,
@@ -102,7 +108,8 @@ class CurlRequest
                                 ], int $maxRedirections = 10, int $timeout = 30,
                                 string $httpVersion = "CURL_HTTP_VERSION_1_1",
                                 string $userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) ".
-                                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36")
+                                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36",
+                                string $filenameForCookies = "")
     {
         $this->url = $url;
         $this->port = $port;
@@ -120,6 +127,18 @@ class CurlRequest
         $this->postFields = $this->preparePostFields($postFields, $postFieldsType);
         $this->httpHeader = $httpHeader;
         $this->userAgent = $userAgent;
+        $this->filenameForCookies = $filenameForCookies;
+    }
+    
+    /**
+     * if this function is called with a not empty string,
+     * the content of file $filenameForCookies will be used as cookies
+     *
+     * @param string $filenameForCookies
+     */
+    public function setCookies(string $filenameForCookies): void
+    {
+        $this->filenameForCookies = $filenameForCookies;
     }
     
     /**
@@ -144,6 +163,17 @@ class CurlRequest
         curl_setopt($curl, CURLOPT_AUTOREFERER, true);
         curl_setopt($curl, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    
+        // cookies
+        if ($this->filenameForCookies) {
+            if (!is_file($this->filenameForCookies))
+                file_put_contents($this->filenameForCookies, "");
+        
+            // set where cookies will be stored
+            curl_setopt($curl, CURLOPT_COOKIEJAR, $this->filenameForCookies);
+            // from where it will get cookies
+            curl_setopt($curl, CURLOPT_COOKIEFILE, $this->filenameForCookies);
+        }
         
         /* to allow https connections */
         /*curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
