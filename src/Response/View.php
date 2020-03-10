@@ -52,14 +52,17 @@ class View extends HttpResponse
      */
     public function getContent(): string
     {
-        ob_start();
-        extract($this->variables);
         // if there is a page to show, it will show it
-        if ($this->pageToShow)
+        if ($this->pageToShow) {
+            ob_start();
+            extract($this->variables);
             require_once(Folder::getSourceFolder().'/View/'.$this->pageToShow.'.php');
+            return ob_get_clean();
+        }
         // if there is a component, will print it
-        else if ($this->component)
-            print_r($this->component);
-        return ob_get_clean();
+        else if ($this->component) {
+            return (string) $this->component;
+        }
+        return "";
     }
 }
