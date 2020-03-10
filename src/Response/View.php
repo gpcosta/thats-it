@@ -8,20 +8,23 @@
 
 namespace ThatsIt\Response;
 
-use ThatsIt\Configurations\Configurations;
-use ThatsIt\Exception\PlatformException;
 use ThatsIt\Folder\Folder;
 
 /**
  * Class View
- * @package ThatsIt\View
+ * @package ThatsIt\Response
  */
 class View extends HttpResponse
 {
     /**
-     * @var string
+     * @var string|null
      */
-    private $viewToShow;
+    private $pageToShow;
+    
+    /**
+     * @var Component|null
+     */
+    private $component;
     
     /**
      * @var array
@@ -30,11 +33,18 @@ class View extends HttpResponse
     
     /**
      * View constructor.
-     * @param string $viewToShow
+     * @param $viewOrComponent - if it's a string, it is interpreted as the name of a view
+     *                           else if it's a Component, it is used as Component
      */
-    public function __construct(string $viewToShow)
+    public function __construct($viewOrComponent)
     {
-        $this->viewToShow = $viewToShow;
+        if ($viewOrComponent instanceof Component) {
+            $this->component = $viewOrComponent;
+            $this->pageToShow = null;
+        } else if (is_string($viewOrComponent)) {
+            $this->pageToShow = $viewOrComponent;
+            $this->component = null;
+        }
     }
     
     /**
@@ -44,7 +54,12 @@ class View extends HttpResponse
     {
         ob_start();
         extract($this->variables);
-        require_once(Folder::getSourceFolder().'/View/'.$this->viewToShow.'.php');
+        // if there is a page to show, it will show it
+        if ($this->pageToShow)
+            require_once(Folder::getSourceFolder().'/View/'.$this->pageToShow.'.php');
+        // if there is a component, will print it
+        else if ($this->component)
+            print_r($this->component);
         return ob_get_clean();
     }
 }
