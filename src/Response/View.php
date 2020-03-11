@@ -9,6 +9,7 @@
 namespace ThatsIt\Response;
 
 use ThatsIt\Folder\Folder;
+use ThatsIt\Response\Component\AppComponent;
 
 /**
  * Class View
@@ -61,7 +62,7 @@ class View extends HttpResponse
             $content = ob_get_clean();
         }
         // if there is a component, will print it
-        else if ($this->component) {
+        else if ($this->component && $this->component instanceof AppComponent) {
             $content = $this->component->render($this->variables);
         }
         return $content;
