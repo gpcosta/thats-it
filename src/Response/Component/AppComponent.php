@@ -8,8 +8,6 @@
 
 namespace ThatsIt\Response\Component;
 
-use ThatsIt\Response\Component;
-
 /**
  * Class AppComponent
  * @package ThatsIt\Response\Component

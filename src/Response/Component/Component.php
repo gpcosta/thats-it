@@ -6,11 +6,9 @@
  * Time: 16:37
  */
 
-namespace ThatsIt\Response;
+namespace ThatsIt\Response\Component;
 
 use Mustache_Engine;
-use ThatsIt\Response\Component\CssFile;
-use ThatsIt\Response\Component\JsFile;
 
 /**
  * Class Component
