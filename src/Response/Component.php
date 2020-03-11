@@ -109,12 +109,24 @@ abstract class Component
     /**
      * @return Mustache_Engine
      */
-    public static function getMustacheEngine(): Mustache_Engine
+    private static function getMustacheEngine(): Mustache_Engine
     {
         if (self::$mustacheEngine === null)
             self::$mustacheEngine = new Mustache_Engine();
         
         return self::$mustacheEngine;
+    }
+    
+    /**
+     * @param string $template - mustache html with mustache variables
+     * @param array $context - array with variables used in $template
+     *                         array key - name of the variable
+     *                         array value - value of the variable
+     * @return string
+     */
+    public function render(string $template, array $context): string
+    {
+        return self::getMustacheEngine()->render($template, $context);
     }
     
     /**
