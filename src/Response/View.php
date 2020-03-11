@@ -62,7 +62,7 @@ class View extends HttpResponse
         }
         // if there is a component, will print it
         else if ($this->component) {
-            $content = $this->component->getContent($this->variables);
+            $content = $this->component->render($this->variables);
         }
         return $content;
     }
