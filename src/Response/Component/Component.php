@@ -24,14 +24,9 @@ abstract class Component
     private $id;
     
     /**
-     * @var string
-     */
-    private $mainContent;
-    
-    /**
      * @var array
      */
-    private $components;
+    private $myComponents;
     
     /**
      * @var array
@@ -70,8 +65,7 @@ abstract class Component
     
     /**
      * Component constructor.
-     * @param string $mainContent
-     * @param array $components
+     * @param array $myComponents
      * @param array $cssFiles
      * @param string $innerCss
      * @param array $jsFilesBeforeBody
@@ -79,14 +73,13 @@ abstract class Component
      * @param array $jsFilesAfterBody
      * @param string $jsAfterBody
      */
-    public function __construct(string $mainContent, array $components = [],
+    public function __construct(array $myComponents = [],
                                 array $cssFiles = [], string $innerCss = "",
                                 array $jsFilesBeforeBody = [], string $jsBeforeBody = "",
                                 array $jsFilesAfterBody = [], string $jsAfterBody = "")
     {
         $this->id = $this->getId();
-        $this->mainContent = $mainContent;
-        $this->components = $components;
+        $this->myComponents = $myComponents;
         $this->cssFiles = $cssFiles;
         $this->innerCss = $innerCss;
         $this->jsFilesBeforeBody = $jsFilesBeforeBody;
@@ -105,21 +98,11 @@ abstract class Component
     }
     
     /**
-     * Returns its own main content (only html from this component)
-     *
-     * @return string
-     */
-    public function getMainContent(): string
-    {
-        return $this->mainContent;
-    }
-    
-    /**
      * @return array
      */
-    public function getComponents(): array
+    public function getMyComponents(): array
     {
-        return $this->components;
+        return $this->myComponents;
     }
     
     /**
@@ -135,7 +118,7 @@ abstract class Component
                 $cssFiles[$cssFile->getHref()] = $cssFile;
         }
         
-        foreach ($this->components as $component) {
+        foreach ($this->myComponents as $component) {
             if ($component instanceof Component) {
                 foreach ($component->getCssFiles() as $cssFile) {
                     if ($cssFile instanceof CssFile)
@@ -155,7 +138,7 @@ abstract class Component
     public function getInnerCss(): string
     {
         $innerCss = $this->innerCss;
-        foreach ($this->components as $component) {
+        foreach ($this->myComponents as $component) {
             if ($component instanceof Component)
                 $innerCss .= $component->getInnerCss();
         }
@@ -175,7 +158,7 @@ abstract class Component
                 $jsFiles[$jsFile->getSrc()] = $jsFile;
         }
     
-        foreach ($this->components as $component) {
+        foreach ($this->myComponents as $component) {
             if ($component instanceof Component) {
                 foreach ($component->getJsFilesBeforeBody() as $jsFile) {
                     if ($jsFile instanceof JsFile)
@@ -195,7 +178,7 @@ abstract class Component
     public function getJsBeforeBody(): string
     {
         $js = $this->jsBeforeBody;
-        foreach ($this->components as $component) {
+        foreach ($this->myComponents as $component) {
             if ($component instanceof Component)
                 $js .= $component->getJsBeforeBody();
         }
@@ -215,7 +198,7 @@ abstract class Component
                 $jsFiles[$jsFile->getSrc()] = $jsFile;
         }
     
-        foreach ($this->components as $component) {
+        foreach ($this->myComponents as $component) {
             if ($component instanceof Component) {
                 foreach ($component->getJsFilesAfterBody() as $jsFile) {
                     if ($jsFile instanceof JsFile)
@@ -235,7 +218,7 @@ abstract class Component
     public function getJsAfterBody(): string
     {
         $js = $this->jsAfterBody;
-        foreach ($this->components as $component) {
+        foreach ($this->myComponents as $component) {
             if ($component instanceof Component)
                 $js .= $component->getJsAfterBody();
         }
@@ -254,7 +237,7 @@ abstract class Component
     }
     
     /**
-     * @param array $context - array with variables used in $mainContent
+     * @param array $context - array with variables used in content that will be render
      *                         array key - name of the variable
      *                         array value - value of the variable
      * @return string

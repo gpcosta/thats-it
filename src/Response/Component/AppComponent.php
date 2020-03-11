@@ -14,46 +14,55 @@ namespace ThatsIt\Response\Component;
  */
 abstract class AppComponent extends Component
 {
-    public function __construct(string $mainContent, array $components = [],
+    /**
+     * AppComponent constructor.
+     * @param array $cssFiles
+     * @param string $innerCss
+     * @param array $jsFilesBeforeBody
+     * @param string $jsBeforeBody
+     * @param array $jsFilesAfterBody
+     * @param string $jsAfterBody
+     */
+    public function __construct(array $myComponents,
                                 array $cssFiles = [], string $innerCss = "",
                                 array $jsFilesBeforeBody = [], string $jsBeforeBody = "",
                                 array $jsFilesAfterBody = [], string $jsAfterBody = "")
     {
-        parent::__construct($mainContent, $components, $cssFiles, $innerCss,
+        parent::__construct($cssFiles, $innerCss,
             $jsFilesBeforeBody, $jsBeforeBody, $jsFilesAfterBody, $jsAfterBody);
     }
     
     /**
      * @return string
      */
-    private function returnCssInHTMLForm(): string
+    private function returnCssInHTML(): string
     {
-        $cssInHTMLForm = '';
+        $cssInHTML = '';
         foreach ($this->getCssFiles() as $cssFile)
-            $cssInHTMLForm .= $cssFile;
-        return $cssInHTMLForm;
+            $cssInHTML .= $cssFile;
+        return $cssInHTML;
     }
     
     /**
      * @return string
      */
-    private function returnJsBeforeBodyInHTMLForm(): string
+    private function returnJsBeforeBodyInHTML(): string
     {
-        $jsInHTMLForm = '';
+        $jsInHTML = '';
         foreach ($this->getJsFilesBeforeBody() as $jsFile)
-            $jsInHTMLForm .= $jsFile;
-        return $jsInHTMLForm;
+            $jsInHTML .= $jsFile;
+        return $jsInHTML;
     }
     
     /**
      * @return string
      */
-    private function returnJsAfterBodyInHTMLForm(): string
+    private function returnJsAfterBodyInHTML(): string
     {
-        $jsInHTMLForm = '';
+        $jsInHTML = '';
         foreach ($this->getJsFilesAfterBody() as $jsFile)
-            $jsInHTMLForm .= $jsFile;
-        return $jsInHTMLForm;
+            $jsInHTML .= $jsFile;
+        return $jsInHTML;
     }
     
     /**
@@ -65,20 +74,26 @@ abstract class AppComponent extends Component
      */
     public function render(array $context): string
     {
+        $title = (isset($context['title']) ? $context['title'] : '');
+        $description = (isset($context['description']) ? $context['description'] : '');
         $metaInfo = (isset($context['metaInfo']) ? $context['metaInfo'] : '');
+        $body = (isset($context['body']) ? $context['body'] : '');
+        
         return <<< HTML
             <!DOCTYPE html>
             <html>
                 <head>
+                    <title>{$title}</title>
+                    <meta name="description" content="{$description}">
                     {$metaInfo}
-                    {$this->returnCssInHTMLForm()}
+                    {$this->returnCssInHTML()}
                     {$this->getInnerCss()}
-                    {$this->returnJsBeforeBodyInHTMLForm()}
+                    {$this->returnJsBeforeBodyInHTML()}
                     {$this->getJsBeforeBody()}
                 </head>
                 <body>
-                    {$this->getMainContent()}
-                    {$this->returnJsAfterBodyInHTMLForm()}
+                    {$body}
+                    {$this->returnJsAfterBodyInHTML()}
                     {$this->getJsAfterBody()}
                 </body>
             </html>
