@@ -118,10 +118,8 @@ abstract class Component
     }
     
     /**
+     * @param array $variables
      * @return string
      */
-    public function __toString()
-    {
-        return $this->styles.$this->scriptsBeforeContent.$this->mainContent.$this->scriptsAfterContent;
-    }
+    abstract public function getContent(array $variables = []): string;
 }
