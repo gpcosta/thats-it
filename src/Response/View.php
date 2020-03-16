@@ -23,7 +23,7 @@ class View extends HttpResponse
     private $pageToShow;
     
     /**
-     * @var Component|null
+     * @var AppComponent|null
      */
     private $component;
     
@@ -39,7 +39,7 @@ class View extends HttpResponse
      */
     public function __construct($viewOrComponent)
     {
-        if ($viewOrComponent instanceof Component) {
+        if ($viewOrComponent instanceof AppComponent) {
             $this->component = $viewOrComponent;
             $this->pageToShow = null;
         } else if (is_string($viewOrComponent)) {
@@ -63,7 +63,7 @@ class View extends HttpResponse
         }
         // if there is a component, will print it
         else if ($this->component && $this->component instanceof AppComponent) {
-            $content = $this->component->render($this->variables);
+            $content = $this->component->render();
         }
         return $content;
     }
