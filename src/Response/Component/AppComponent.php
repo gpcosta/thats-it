@@ -16,6 +16,7 @@ abstract class AppComponent extends Component
 {
     /**
      * AppComponent constructor.
+     * @param array $myComponents
      * @param array $cssFiles
      * @param string $innerCss
      * @param array $jsFilesBeforeBody
@@ -28,7 +29,7 @@ abstract class AppComponent extends Component
                                 array $jsFilesBeforeBody = [], string $jsBeforeBody = "",
                                 array $jsFilesAfterBody = [], string $jsAfterBody = "")
     {
-        parent::__construct($cssFiles, $innerCss,
+        parent::__construct($myComponents, $cssFiles, $innerCss,
             $jsFilesBeforeBody, $jsBeforeBody, $jsFilesAfterBody, $jsAfterBody);
     }
     
@@ -66,19 +67,17 @@ abstract class AppComponent extends Component
     }
     
     /**
-     * @param array $context
+     * @param string $body
+     * @param string $title
+     * @param string $description
+     * @param string $metaInfo
      * @return string
      *
-     * @NOTE: $context['metaInfo'] will have all tags to populate the <head>
+     * @NOTE: $metaInfo will have all tags to populate the <head>
      *        except css and js code and files
      */
-    public function render(array $context): string
+    public function renderHTML(string $body = '', string $title = '', string $description = '', string $metaInfo = ''): string
     {
-        $title = (isset($context['title']) ? $context['title'] : '');
-        $description = (isset($context['description']) ? $context['description'] : '');
-        $metaInfo = (isset($context['metaInfo']) ? $context['metaInfo'] : '');
-        $body = (isset($context['body']) ? $context['body'] : '');
-        
         return <<< HTML
             <!DOCTYPE html>
             <html>
@@ -94,7 +93,11 @@ abstract class AppComponent extends Component
                 <body>
                     {$body}
                     {$this->returnJsAfterBodyInHTML()}
-                    {$this->getJsAfterBody()}
+                    <script>
+                        window.onload = function() {
+                            {$this->getJsAfterBody()}
+                        }
+                    </script>
                 </body>
             </html>
 HTML;

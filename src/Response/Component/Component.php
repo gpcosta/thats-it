@@ -89,6 +89,22 @@ abstract class Component
     }
     
     /**
+     * Method to be called from the outside to allow the rendering of the component
+     *
+     * @return string
+     */
+    abstract public function render(): string;
+    
+    /**
+     * Method to be called in the end of the render() method (like: return parent::renderHTML();)
+     * to join the body rendered by the current Component to the parent body
+     *
+     * @param string $body
+     * @return string
+     */
+    abstract protected function renderHTML(string $body): string;
+    
+    /**
      * @return int
      */
     public function getId(): int
@@ -235,12 +251,4 @@ abstract class Component
         
         return self::$mustacheEngine;
     }
-    
-    /**
-     * @param array $context - array with variables used in content that will be render
-     *                         array key - name of the variable
-     *                         array value - value of the variable
-     * @return string
-     */
-    abstract public function render(array $context): string;
 }
