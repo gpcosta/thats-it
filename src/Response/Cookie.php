@@ -61,9 +61,10 @@ class Cookie
      * @param bool $httpOnly
      * @param bool $secure
      * @param string $path
+     * @param string $domain
      */
     public function __construct(string $name, $value = "", int $maxAge = 0, bool $httpOnly = true,
-                                bool $secure = true, $path = "/")
+                                bool $secure = true, $path = "/", string $domain = "")
     {
         $this->name = $name;
         $this->value = (string) $value;
@@ -71,6 +72,7 @@ class Cookie
         $this->path = $path;
         $this->secure = $secure;
         $this->httpOnly = $httpOnly;
+        $this->domain = $domain;
     }
     
     /**
@@ -159,8 +161,11 @@ class Cookie
             $this->getPathString(),
             $this->getSecureString(),
             $this->getHttpOnlyString(),
+            $this->getDomainString()
         ];
-        
+    
+        // in this case, there is no callback supplied,
+        // so all entries of array equal to FALSE will be removed
         $filteredParts = array_filter($parts);
         
         return implode('; ', $filteredParts);
