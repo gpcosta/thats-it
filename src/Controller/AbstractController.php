@@ -9,6 +9,7 @@ use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\RedirectResponse;
+use ThatsIt\Session\CSRFToken;
 
 /**
  * Class AbstractController
@@ -70,6 +71,8 @@ abstract class AbstractController
 		$this->routes = $routes;
         $this->currentRoute = $currentRoute;
 		$this->logger = $logger;
+		
+		CSRFToken::setCSRFTokenFromCookies($request);
 	}
     
     /**
