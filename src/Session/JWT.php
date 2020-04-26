@@ -187,4 +187,148 @@ class JWT
         \Firebase\JWT\JWT::$timestamp = self::$timestamp;
         return \Firebase\JWT\JWT::encode($payload, $key, $alg, $keyId, $head);
     }
+    
+    /**
+     * @return array
+     */
+    public function getPayload(): array
+    {
+        return $this->payload;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getIssuer(): ?string
+    {
+        return $this->issuer;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getSubject(): ?string
+    {
+        return $this->subject;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getAudience(): ?string
+    {
+        return $this->audience;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getExpirationTime(): ?int
+    {
+        return $this->expirationTime;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getNotBefore(): ?int
+    {
+        return $this->notBefore;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getIssuedAt(): ?int
+    {
+        return $this->issuedAt;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getJwtId(): ?string
+    {
+        return $this->jwtId;
+    }
+    
+    /**
+     * @param array $payload
+     * @return JWT
+     */
+    public function setPayload(array $payload): self
+    {
+        $this->payload = $payload;
+        return $this;
+    }
+    
+    /**
+     * @param string $issuer
+     * @return JWT
+     */
+    public function setIssuer(string $issuer): self
+    {
+        $this->issuer = $issuer;
+        return $this;
+    }
+    
+    /**
+     * @param string $subject
+     * @return JWT
+     */
+    public function setSubject(string $subject): self
+    {
+        $this->subject = $subject;
+        return $this;
+    }
+    
+    /**
+     * @param string $audience
+     * @return JWT
+     */
+    public function setAudience(string $audience): self
+    {
+        $this->audience = $audience;
+        return $this;
+    }
+    
+    /**
+     * @param int $expirationTime
+     * @return JWT
+     */
+    public function setExpirationTime(int $expirationTime): self
+    {
+        $this->expirationTime = $expirationTime;
+        return $this;
+    }
+    
+    /**
+     * @param int $notBefore
+     * @return JWT
+     */
+    public function setNotBefore(int $notBefore): self
+    {
+        $this->notBefore = $notBefore;
+        return $this;
+    }
+    
+    /**
+     * @param int $issuedAt
+     * @return JWT
+     */
+    public function setIssuedAt(int $issuedAt): self
+    {
+        $this->issuedAt = $issuedAt;
+        return $this;
+    }
+    
+    /**
+     * @param string $jwtId
+     * @return JWT
+     */
+    public function setJwtId(string $jwtId): self
+    {
+        $this->jwtId = $jwtId;
+        return $this;
+    }
 }
