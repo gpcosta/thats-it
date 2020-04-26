@@ -8,6 +8,11 @@
 
 namespace ThatsIt\Session;
 
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
+use UnexpectedValueException;
+
 /**
  * Class JWT
  * @package ThatsIt\Session
@@ -115,6 +120,12 @@ class JWT
      * @param array                     $allowed_algs   List of supported verification algorithms
      *                                                  Supported algorithms are 'ES256', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', and 'RS512'
      * @return JWT
+     *
+     * @throws UnexpectedValueException    Provided JWT was invalid
+     * @throws SignatureInvalidException    Provided JWT was invalid because the signature verification failed
+     * @throws BeforeValidException         Provided JWT is trying to be used before it's eligible as defined by 'nbf'
+     * @throws BeforeValidException         Provided JWT is trying to be used before it's been created as defined by 'iat'
+     * @throws ExpiredException             Provided JWT has since expired, as defined by the 'exp' claim
      */
     public static function decode($jwt, $key, array $allowed_algs = array()): self
     {
