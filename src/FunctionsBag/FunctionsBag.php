@@ -120,4 +120,50 @@ class FunctionsBag
         
         return $path;
     }
+    
+    /**
+     * @param string $date
+     * @param string $fromTimezone
+     * @param string $toTimezone
+     * @param string $format
+     * @return string
+     * @throws \Exception
+     */
+    public static function changeTimezoneDate(string $date, string $fromTimezone = "UTC", string $toTimezone = "UTC",
+                                              string $format = 'Y-m-d H:i:s'): string
+    {
+        if ($date === null) throw new \Exception("Date cannot be null.");
+        $dateTime = new \DateTime($date, new \DateTimeZone($fromTimezone));
+        $dateTime->setTimezone(new \DateTimeZone($toTimezone));
+        return $dateTime->format($format);
+    }
+    
+    /**
+     * Returns a valid date in the format expected
+     *
+     * @param string $date
+     * @param string $format
+     * @return string
+     * @throws \Exception
+     */
+    public static function returnValidDate(string $date = "now", string $format = 'Y-m-d H:i:s'): string
+    {
+        // self::changeTimezoneDate already returns a validDate
+        // if fromTimezone and toTimezone are the same, a validDate will be returned without changing timezone
+        return self::changeTimezoneDate($date, "UTC", "UTC", $format);
+    }
+    
+    /**
+     * Get $date1 - $date2
+     *
+     * @param string $date1
+     * @param string $date2
+     * @return int
+     */
+    public static function getDifferenceBetweenDates(string $date1, string $date2): int
+    {
+        $date1 = new \DateTime($date1);
+        $date2 = new \DateTime($date2);
+        return (int) $date2->diff($date1)->format("%r%a");
+    }
 }
