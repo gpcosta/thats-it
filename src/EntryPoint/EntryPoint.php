@@ -62,6 +62,8 @@ class EntryPoint
         $this->generalConfig = $generalConfig;
         $this->environment = $environment;
         
+        FunctionsBag::setYourDomain($this->generalConfig['domain']);
+        
         try {
             $this->logger = new Logger('ThatsIt');
         } catch (\Exception $e) {

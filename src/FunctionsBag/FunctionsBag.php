@@ -30,6 +30,11 @@ class FunctionsBag
     private static $httpHost = "";
     
     /**
+     * @var string
+     */
+    private static $yourDomain = "";
+    
+    /**
      * @return null|string
      */
     public static function getRoutesPath(): ?string
@@ -59,6 +64,22 @@ class FunctionsBag
     public static function setHttpHost(string $httpHost): void
     {
         self::$httpHost = $httpHost;
+    }
+    
+    /**
+     * @return string
+     */
+    public static function getYourDomain(): string
+    {
+        return self::$yourDomain;
+    }
+    
+    /**
+     * @param string $yourDomain
+     */
+    public static function setYourDomain(string $yourDomain): void
+    {
+        self::$yourDomain = $yourDomain;
     }
     
     /**
