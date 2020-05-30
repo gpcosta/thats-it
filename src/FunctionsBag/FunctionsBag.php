@@ -32,7 +32,7 @@ class FunctionsBag
     /**
      * @var string
      */
-    private static $yourDomain = "";
+    private static $myDomain = "";
     
     /**
      * @return null|string
@@ -69,17 +69,17 @@ class FunctionsBag
     /**
      * @return string
      */
-    public static function getYourDomain(): string
+    public static function getMyDomain(): string
     {
-        return self::$yourDomain;
+        return self::$myDomain;
     }
     
     /**
-     * @param string $yourDomain
+     * @param string $myDomain
      */
-    public static function setYourDomain(string $yourDomain): void
+    public static function setMyDomain(string $myDomain): void
     {
-        self::$yourDomain = $yourDomain;
+        self::$myDomain = $myDomain;
     }
     
     /**
