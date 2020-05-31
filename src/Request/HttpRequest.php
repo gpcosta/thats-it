@@ -288,13 +288,20 @@ class HttpRequest
     public function getHost(bool $withHttp = true)
     {
         $host = $this->getServerVariable('HTTP_HOST');
-        if ($withHttp) {
-            // If the request was sent with HTTPS you will have a extra parameter in the $_SERVER superglobal - $_SERVER['HTTPS']
-            $httpOrHttps = "http";
-            if (isset($_SERVER['HTTPS'])) $httpOrHttps .= "s";
-            $host = $httpOrHttps."://".$host;
-        }
+        if ($withHttp)
+            $host = $this->getHttpOrHttps()."://".$host;
         return $host;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getHttpOrHttps()
+    {
+        // If the request was sent with HTTPS you will have a extra parameter in the $_SERVER superglobal - $_SERVER['HTTPS']
+        $httpOrHttps = "http";
+        if (isset($_SERVER['HTTPS'])) $httpOrHttps .= "s";
+        return $httpOrHttps;
     }
     
     /**
