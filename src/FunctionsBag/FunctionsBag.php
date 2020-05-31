@@ -86,12 +86,12 @@ class FunctionsBag
      * @param string $name
      * @param array $variables[name => value]
      * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
-     * @param bool $addHttpHost (if true, will add the domain to the url)
+     * @param bool $addDomain (if true, will add the domain to the url)
      * @return string
      * @throws PlatformException
      */
     public static function getUrl(string $name, array $variables = [], bool $withOptional = false,
-                                  bool $addHttpHost = false): string
+                                  bool $addDomain = false): string
     {
         static $routes;
         
@@ -137,7 +137,7 @@ class FunctionsBag
                 PlatformException::ERROR_NOT_FOUND_DANGER);
         }
         
-        if ($addHttpHost) $path = self::$httpHost.$path;
+        if ($addDomain) $path = self::$myDomain.$path;
         
         return $path;
     }
