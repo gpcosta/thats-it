@@ -8,6 +8,9 @@
 
 namespace ThatsIt\Session;
 
+use Godruoyi\Snowflake\Snowflake;
+use ThatsIt\Configurations\Configurations;
+
 /**
  * Class IDGenerator
  * @package ThatsIt\Session
@@ -40,5 +43,25 @@ class IDGenerator
             $token .= $codeAlphabet[random_int(0, $max-1)];
         
         return $token;
+    }
+    
+    /**
+     * Generate a Twitter Snowflake ID
+     *
+     * It uses the following library:
+     *      - https://github.com/godruoyi/php-snowflake
+     *
+     * To understand why this type of ID is important, please see the following article:
+     *      - https://www.callicoder.com/distributed-unique-id-sequence-number-generator/
+     *
+     * @return int
+     * @throws \ThatsIt\Exception\PlatformException
+     */
+    public static function generateSnowflakeID(): int
+    {
+        $snowflakeConfig = Configurations::getSnowflakeConfig();
+        $snowflake = new Snowflake($snowflakeConfig['datacenterId'], $snowflakeConfig['workerId']);
+        $snowflake->setStartTimeStamp(strtotime('2020-06-01')*1000);
+        return $snowflake->id();
     }
 }
