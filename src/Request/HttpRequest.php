@@ -67,7 +67,12 @@ class HttpRequest
         $this->postParameters = $post;
         parse_str($inputStream, $this->putParameters);
         $this->cookies = $cookies;
-        $this->files = $files;
+        $this->files = [];
+        foreach ($files as $key => $file) {
+            // error == 4 means that there is no uploaded file
+            if (is_array($file) && $file['error'] != 4)
+                $this->files[$key] = $file;
+        }
         $this->server = $server;
         $this->inputStream = $inputStream;
     }
