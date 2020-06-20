@@ -108,8 +108,10 @@ class VerifyConfigFolderState extends StateCommand
             PHP_EOL.
             "return array(".PHP_EOL.
                 "\t'environment' => 'development', // or 'production' when you're ready for it :)".PHP_EOL.
-                "\t'locationServer' => '".Folder::getSourceFolder()."/Public'".PHP_EOL.
-                "\t'domain' => 'your_domain.example.com'".PHP_EOL.
+                "\t'locationServer' => '".Folder::getSourceFolder()."/Public', // where you put index.php".PHP_EOL.
+                "\t'domain' => 'your_domain.example.com', // 'http://localhost'".PHP_EOL.
+                "\t'datacenterId' => 0, // min of 0 and max of 31 => 0 <= datacenterId <= 31".PHP_EOL.
+                "\t'workerId' => 0 // min of 0 and max of 31 => 0 <= workerId <= 31".PHP_EOL.
             ");";
     }
     

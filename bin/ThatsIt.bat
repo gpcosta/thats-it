@@ -10,7 +10,10 @@ if not exist "config/config.php" (
     echo. >> config/config.php
     echo return [ >> config/config.php
     echo    'environment' =^> 'development', // or 'production' when you're ready for it :^) >> config/config.php
-    echo    'locationServer' =^> '%cd%\src\Public' // where you put index.php >> config/config.php
+    echo    'locationServer' =^> '%cd%\src\Public', // where you put index.php >> config/config.php
+    echo    'domain' => 'your_domain.example.com', // 'http://localhost' >> config/config.php
+    echo    'datacenterId' => 0, // min of 0 and max of 31 => 0 <= datacenterId <= 31 >> config/config.php
+    echo    'workerId' => 0 // min of 0 and max of 31 => 0 <= workerId <= 31 >> config/config.php
     echo ]; >> config/config.php
 
     echo Created config/config.php

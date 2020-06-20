@@ -14,7 +14,10 @@ then
     echo >> config/config.php
     echo 'return [' >> config/config.php
     echo -e '\t"environment" => "development", // or "production" when you'"'"'re ready for it :)' >> config/config.php
-    echo -e '\t"locationServer" => "'$(pwd)'/src/Public" // where you put index.php' >> config/config.php
+    echo -e '\t"locationServer" => "'$(pwd)'/src/Public", // where you put index.php' >> config/config.php
+    echo -e '\t"domain" => "your_domain.example.com", // "http://localhost"' >> config/config.php
+    echo -e '\t"datacenterId" => 0, // min of 0 and max of 31 => 0 <= datacenterId <= 31' >> config/config.php
+    echo -e '\t"workerId" => 0 // min of 0 and max of 31 => 0 <= workerId <= 31' >> config/config.php
     echo '];' >> config/config.php
 
     echo "Created config/config.php"
