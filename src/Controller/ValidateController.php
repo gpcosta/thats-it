@@ -33,11 +33,6 @@ class ValidateController
     private $functionName;
     
     /**
-     * @var array
-     */
-    private $givenParameters;
-    
-    /**
      * ValidateController constructor.
      * @param array $route
      */
@@ -46,17 +41,6 @@ class ValidateController
         $this->route = $route;
         $this->controllerName = $route['controller'];
         $this->functionName = $route['function'];
-        $this->givenParameters = ['parameters'];
-    }
-    
-    /**
-     * @return bool
-     * @throws \Exception
-     */
-    public function verifyControllerAndFunction(): bool
-    {
-        $this->getReflectionMethod();
-        return true;
     }
     
     /**
@@ -114,8 +98,9 @@ class ValidateController
             $reflectionMethod = $reflectionController->getMethod($this->functionName);
             return $reflectionMethod;
         } catch (\ReflectionException $e) {
-            throw new PlatformException("It was not possible to found the controller ".$this->controllerName.
-                " or the method ".$this->functionName, PlatformException::ERROR_NOT_FOUND_DANGER);
+            throw new PlatformException("It was not possible to found the controller ".
+                $this->controllerName." or the method ".$this->functionName,
+                PlatformException::ERROR_NOT_FOUND_DANGER, $e);
         }
     }
     
