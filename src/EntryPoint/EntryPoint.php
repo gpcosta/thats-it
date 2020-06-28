@@ -5,7 +5,6 @@ namespace ThatsIt\EntryPoint;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
-use ThatsIt\Configurations\Configurations;
 use ThatsIt\Controller\ValidateController;
 use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\PlatformException;
@@ -13,9 +12,11 @@ use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\HttpResponse;
-use ThatsIt\Response\JsonResponse;
 use ThatsIt\Response\SendResponse;
 use ThatsIt\Response\View;
+use ThatsIt\Sanitizer\ArrayOfInputsToSanitize;
+use ThatsIt\Sanitizer\InputToSanitize;
+use ThatsIt\Sanitizer\Sanitizer;
 
 /**
  * Class EntryPoint
@@ -95,8 +96,9 @@ class EntryPoint
                 );
             }
             $validateController = new ValidateController($currentRoute);
-            $givenParameters = $this->getSanitizedParameters(array_merge($this->request->getParameters(), $info['vars']));
+            $givenParameters = array_merge($this->request->getParameters(), $info['vars']);
             $parameters = $validateController->getCorrectParameters($givenParameters);
+            $parameters = $this->getSanitizedParameters($parameters, $currentRoute['parameters']);
             $controllerToCall = new $info['controller']($this->environment, $this->request,
                 $this->routes, $currentRoute, $this->logger);
             $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
@@ -183,23 +185,28 @@ class EntryPoint
     }
     
     /**
-     * Sanitize a multidimensional array with htmlspecialchars
-     *
-     * IMPORTANT: if wants to revert the sanitization process,
-     *            you have to use htmlspecialchars_decode function
-     *
-     * Heavily inspired in https://gist.github.com/esthezia/5804445
+     * Sanitize $givenParameters with the provided sanitizer
+     * methods provided by $currentRouteParameters
      *
      * @param array $givenParameters
+     * @param array $currentRouteParameters
      * @return array
      */
-    private function getSanitizedParameters(array $givenParameters): array
+    private function getSanitizedParameters(array $givenParameters, array $currentRouteParameters): array
     {
-        foreach ($givenParameters as $key => $value) {
-            if (!is_array($value) && !is_object($value)) {
-                $givenParameters[$key] = htmlspecialchars(trim($value));
+        foreach ($givenParameters as $parameterName => $parameterValue) {
+            $sanitizerToUse = (isset($currentRouteParameters[$parameterName]['sanitizer']) ?
+                $currentRouteParameters[$parameterName]['sanitizer'] : Sanitizer::SANITIZER_TEXT_ONLY
+            );
+            if (!is_array($parameterValue) && !is_object($parameterValue)) {
+                $givenParameters[$parameterName] = (new InputToSanitize(
+                    $parameterName, $parameterValue, $sanitizerToUse
+                ))->getSanitizedInput();
+            } else if (is_array($parameterValue)) {
+                $givenParameters[$parameterName] = (new ArrayOfInputsToSanitize(
+                    $parameterName, $parameterValue, $sanitizerToUse
+                ))->getSanitizedInput();
             }
-            if (is_array($value)) $data[$key] = $this->getSanitizedParameters($value);
         }
         return $givenParameters;
     }
