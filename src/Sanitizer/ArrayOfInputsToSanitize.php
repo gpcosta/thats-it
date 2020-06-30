@@ -48,17 +48,27 @@ class ArrayOfInputsToSanitize implements IInputToSanitize
     /**
      * Sanitize $inputs (a multidimensional array)
      *
-     * Heavily inspired in https://gist.github.com/esthezia/5804445
-     *
      * @return array
      */
     public function getSanitizedInput(): array
     {
+        return $this->getSanitizedArrayOfInputs($this->inputsToSanitize);
+    }
+    
+    /**
+     * Heavily inspired in https://gist.github.com/esthezia/5804445
+     *
+     * @param array $inputs
+     * @return array
+     */
+    private function getSanitizedArrayOfInputs(array $inputs): array
+    {
         $sanitizedInputs = [];
-        foreach ($this->inputsToSanitize as $inputToSanitize) {
-            if ($inputToSanitize instanceof IInputToSanitize) {
+        foreach ($inputs as $inputToSanitizeName => $inputToSanitize) {
+            if (is_array($inputToSanitize))
+                $sanitizedInputs[$inputToSanitizeName] = $this->getSanitizedArrayOfInputs($inputToSanitize);
+            else if ($inputToSanitize instanceof InputToSanitize)
                 $sanitizedInputs[$inputToSanitize->getInputName()] = $inputToSanitize->getSanitizedInput();
-            }
         }
         return $sanitizedInputs;
     }
