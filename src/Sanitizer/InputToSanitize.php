@@ -40,7 +40,7 @@ class InputToSanitize implements IInputToSanitize
      */
     public function __construct(string $inputName, $inputValue, int $sanitizer)
     {
-        if (!is_array($inputValue) && !is_object($inputValue))
+        if (is_array($inputValue) || is_object($inputValue))
             throw new \InvalidArgumentException('Argument inputValue should not be an array or an object.');
         
         $this->inputName = $inputName;
@@ -64,15 +64,14 @@ class InputToSanitize implements IInputToSanitize
         switch ($this->sanitizer) {
             case Sanitizer::SANITIZER_NONE:
                 return $this->inputValue;
-                break;
             case Sanitizer::SANITIZER_HTML_SAFETY:
                 $config = HTMLPurifier_Config::createDefault();
                 $purifier = new HTMLPurifier($config);
                 return $purifier->purify($this->inputValue);
-                break;
             case Sanitizer::SANITIZER_TEXT_ONLY:
-                return htmlspecialchars(trim($this->inputValue));
-                break;
+                $sanitizedInput = htmlspecialchars(trim($this->inputValue), ENT_QUOTES);
+                // remove weird spaces
+                return preg_replace('/[\r\n\t\f\v]/', ' ', $sanitizedInput);
             default:
                 throw new \InvalidArgumentException('Argument filter must be one of the following: '.
                     'Filter::FILTER_NONE, Filter::FILTER_HTML_SAFETY or Filter::FILTER_TEXT_ONLY');
