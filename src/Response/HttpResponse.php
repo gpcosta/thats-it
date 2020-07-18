@@ -223,11 +223,31 @@ abstract class HttpResponse
     }
     
     /**
+     * @param string $name
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getVariable(string $name, $default = null)
+    {
+        if (array_key_exists($name, $this->variables))
+            return $this->variables[$name];
+        return $default;
+    }
+    
+    /**
      * @param array $variables
      */
     public function setVariables(array $variables): void
     {
         $this->variables = $variables;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getVariables(): array
+    {
+        return $this->variables;
     }
     
     /**
