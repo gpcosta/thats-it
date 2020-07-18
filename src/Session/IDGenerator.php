@@ -22,10 +22,12 @@ class IDGenerator
      *
      * @param int $length
      * @param bool $removeVowels - remove vowels to avoid words like "penis" on others
+     * @param bool $removeHyphensAndUnderscores - remove hyphens and underscores
      * @return string
      * @throws \Exception
      */
-    public static function generateBase64ID(int $length, bool $removeVowels = false)
+    public static function generateBase64ID(int $length, bool $removeVowels = false,
+                                            bool $removeHyphensAndUnderscores = false)
     {
         $token = "";
         // remove vowels to avoid words like "penis" on others
@@ -36,6 +38,10 @@ class IDGenerator
             $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             $codeAlphabet .= "abcdefghijklmnopqrstuvwxyz";
         }
+        
+        if (!$removeHyphensAndUnderscores)
+            $codeAlphabet .= "-_";
+        
         $codeAlphabet .= "0123456789";
         $max = strlen($codeAlphabet);
         
