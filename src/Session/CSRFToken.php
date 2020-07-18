@@ -52,18 +52,16 @@ class CSRFToken
     }
     
     /**
-     * Gets from Cookies of the provided Http Request the current CSRF Token
+     * Get current CSRF Token from Cookies of the provided Http Request
      * If none CSRF Token exists in Http Request, returns null
      *
      * @param HttpRequest $request
      * @return null|CSRFToken
      */
-    public static function setCSRFTokenFromCookies(HttpRequest $request): ?self
+    public static function getCSRFTokenFromCookies(HttpRequest $request): ?self
     {
         $csrfToken = $request->getCookie(self::COOKIE_CSRF);
-        if ($csrfToken !== null)
-            self::$currentCSRFToken = new CSRFToken($csrfToken);
-        return self::$currentCSRFToken;
+        return $csrfToken ? new CSRFToken($csrfToken) : null;
     }
     
     /**
