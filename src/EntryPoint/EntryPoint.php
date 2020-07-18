@@ -95,23 +95,17 @@ class EntryPoint
                     PlatformException::ERROR_NOT_FOUND_DANGER
                 );
             }
-            $validateController = new ValidateController($currentRoute);
+            
             $givenParameters = array_merge($this->request->getParameters(), $info['vars']);
-            $parameters = $validateController->getCorrectParameters($givenParameters);
-            $parameters = $this->getSanitizedParameters($parameters, $currentRoute['parameters']);
-            $controllerToCall = new $info['controller']($this->environment, $this->request,
+            $sanitizedParameters = $this->getSanitizedParameters($givenParameters, $currentRoute['parameters']);
+            $validateController = new ValidateController($currentRoute['controller'], $currentRoute['function'],
+                $currentRoute['parameters'], $sanitizedParameters);
+            $validateController->callConstructor($this->environment, $this->request,
                 $this->routes, $currentRoute, $this->logger);
-            $response = call_user_func_array(array($controllerToCall, $info['function']), $parameters);
+            $response = $validateController->callMethod();
     
-            if ($response instanceof HttpResponse) {
-                $send = new SendResponse($response);
-                $send->send();
-            } else {
-                throw new PlatformException(
-                    "Controller has to return a class that implements ThatsIt\\Response\\HttpResponse class.",
-                    PlatformException::ERROR_RESPONSE
-                );
-            }
+            $send = new SendResponse($response);
+            $send->send();
         } catch (ClientException $e) {
             $this->logger->addWarning($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
             if ($e->getCode() == 404) $this->sendErrorMessage(404, $e->getMessage(), 'Error/error404');

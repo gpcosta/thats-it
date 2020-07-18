@@ -10,6 +10,9 @@ namespace ThatsIt\Controller;
 
 use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\Logger\Logger;
+use ThatsIt\Request\HttpRequest;
+use ThatsIt\Response\HttpResponse;
 
 /**
  * Class ValidateController
@@ -17,6 +20,13 @@ use ThatsIt\Exception\PlatformException;
  */
 class ValidateController
 {
+    /**
+     * this constant will hold how many default arguments a controller constructor takes
+     * this means that constructor takes at least this number of arguments
+     * and can take some more, for example variables passed as parameters from a request
+     */
+    private const ARGS_DEFAULT_CONSTRUCTOR = 5;
+    
     /**
      * @var array
      */
@@ -28,119 +38,187 @@ class ValidateController
     private $controllerName;
     
     /**
+     * @var \ReflectionClass
+     */
+    private $reflectionController;
+    
+    /**
+     * @var AbstractController|null
+     */
+    private $controller;
+    
+    /**
      * @var string
      */
-    private $functionName;
+    private $methodName;
+    
+    /**
+     * @var \ReflectionMethod
+     */
+    private $reflectionMethod;
+    
+    /**
+     * @var array
+     */
+    private $routeParameters;
+    
+    /**
+     * @var array
+     */
+    private $givenParameters;
+    
+    /**
+     * @var array
+     */
+    private $correctParameters;
     
     /**
      * ValidateController constructor.
-     * @param array $route
-     */
-    public function __construct(array $route)
-    {
-        $this->route = $route;
-        $this->controllerName = $route['controller'];
-        $this->functionName = $route['function'];
-    }
-    
-    /**
+     * @param string $controllerName
+     * @param string $methodName
+     * @param array $routeParameters
      * @param array $givenParameters
+     * @throws PlatformException
+     * @throws \ReflectionException
+     */
+    public function __construct(string $controllerName, string $methodName, array $routeParameters,
+                                array $givenParameters)
+    {
+        $this->controllerName = $controllerName;
+        $this->reflectionController = new \ReflectionClass($this->controllerName);
+        $this->controller = null;
+        $this->methodName = $methodName;
+        $this->reflectionMethod = $this->reflectionController->getMethod($this->methodName);
+        $this->routeParameters = $routeParameters;
+        $this->givenParameters = $givenParameters;
+        $this->correctParameters = $this->getCorrectParameters();
+    }
+    
+    /**
+     * @param string $environment
+     * @param HttpRequest $request
+     * @param array $routes
+     * @param array|null $currentRoute
+     * @param Logger $logger
+     * @return ValidateController
+     * @throws PlatformException
+     */
+    public function callConstructor(string $environment, HttpRequest $request, array $routes,
+                                    ?array $currentRoute, Logger $logger): self
+    {
+        $constructorParameters = $this->reflectionController->getConstructor()->getParameters();
+        $args = [$environment, $request, $routes, $currentRoute, $logger];
+        for ($i = self::ARGS_DEFAULT_CONSTRUCTOR, $len = count($constructorParameters); $i < $len; $i++) {
+            $parameter = $constructorParameters[$i];
+            if (!array_key_exists($parameter->getName(), $this->correctParameters))
+                throw new PlatformException(
+                    'Controller constructor has parameters that were not passed.',
+                    400
+                );
+            
+            $args[] = $this->correctParameters[$parameter->getName()];
+        }
+        $this->controller = $this->reflectionController->newInstanceArgs($args);
+        return $this;
+    }
+    
+    /**
+     * @return HttpResponse
+     * @throws PlatformException
+     */
+    public function callMethod(): HttpResponse
+    {
+        $methodParameters = $this->reflectionMethod->getParameters();
+        $args = [];
+        foreach ($methodParameters as $key => $parameter) {
+            if (!array_key_exists($parameter->getName(), $this->correctParameters))
+                throw new PlatformException(
+                    'Controller method has parameters that were not passed.',
+                    400
+                );
+            
+            $args[] = $this->correctParameters[$parameter->getName()];
+        }
+        
+        if (!$this->controller)
+            throw new PlatformException(
+                'There was an error calling Controller constructor.',
+                500
+            );
+        
+        $response = $this->reflectionMethod->invokeArgs($this->controller, $args);
+        if (!($response instanceof HttpResponse))
+            throw new PlatformException(
+                "Controller method has to return a class that implements ThatsIt\\Response\\HttpResponse class.",
+                PlatformException::ERROR_RESPONSE
+            );
+        
+        return $response;
+    }
+    
+    /**
      * @return array
-     * @throws ClientException
      * @throws PlatformException
      */
-    public function getCorrectParameters(array $givenParameters): array
+    private function getCorrectParameters(): array
     {
-        $correctParameters = array();
-    
-        $parametersInRealController = $this->getReflectionMethod()->getParameters();
-        
-        $this->allParametersAreInRouter($parametersInRealController);
-        
-        foreach ($parametersInRealController as $key => $parameter) {
-            $givenParameter = isset($givenParameters[$parameter->getName()]) ?
-                $givenParameters[$parameter->getName()] :
-                null;
-    
-            if ($this->isParameterProvided($parameter, $givenParameters)) {
-                // parameter provided but not from the same type of expected parameter
-                if (!$this->isSameTypeFromProvidedParameter($parameter, $givenParameter)) {
-                    throw new ClientException("Parameter " . $parameter->getName() .
-                        ($parameter->hasType() ? " (" . $parameter->getType() . ")" : "") . " necessary.", 405);
-                }
-                
-                $correctParameters[$parameter->getPosition()] = $givenParameters[$parameter->getName()];
-            } else if ($this->hasDefault($parameter)) {
-                // parameter not provided and the default parameter is not from the expected in controller
-                if (!$this->isSameTypeFromDefaultParameter($parameter)) {
-                    throw new ClientException("Default parameter " . $parameter->getName() .
-                        " doesn't have the expected type.", 405);
-                }
-                
-                $correctParameters[$parameter->getPosition()] =
-                    $this->route['parameters'][$parameter->getName()]['default'];
-            } else /*if (!$parameter->isOptional())*/ {
-                throw new ClientException("There is no provided or default parameter.", 405);
-            }
-        }
-        
-        return $correctParameters;
-    }
-    
-    /**
-     * @return \ReflectionMethod
-     * @throws PlatformException
-     */
-    private function getReflectionMethod(): \ReflectionMethod
-    {
-        try {
-            $reflectionController = new \ReflectionClass($this->controllerName);
-            $reflectionMethod = $reflectionController->getMethod($this->functionName);
-            return $reflectionMethod;
-        } catch (\ReflectionException $e) {
-            throw new PlatformException("It was not possible to found the controller ".
-                $this->controllerName." or the method ".$this->functionName,
-                PlatformException::ERROR_NOT_FOUND_DANGER, $e);
-        }
-    }
-    
-    /**
-     * @param array $parametersInRealController(\ReflectionParameter)
-     * @throws PlatformException
-     */
-    private function allParametersAreInRouter(array $parametersInRealController): void
-    {
-        foreach ($parametersInRealController as $controllerParameter) {
-            if (!($controllerParameter instanceof \ReflectionParameter)
-                || !array_key_exists($controllerParameter->getName(), $this->route["parameters"])) {
+        $controllerReflectionParametersByName = $this->getControllerReflectionParametersByName();
+        $correctParameters = [];
+        foreach ($this->routeParameters as $name => $infoAboutParameter) {
+            // verify if route parameter exists in controller contructor or method parameters
+            if (!array_key_exists($name, $controllerReflectionParametersByName))
                 throw new PlatformException(
                     "Controller parameters are incompatible with Route parameters.",
                     PlatformException::ERROR_NOT_FOUND_DANGER
                 );
+            
+            if (!array_key_exists($name, $this->givenParameters)) {
+                // there is no given parameter and no default value
+                if (!array_key_exists('default', $infoAboutParameter))
+                    throw new PlatformException(
+                        "Given parameters are incompatible with Route parameters.",
+                        PlatformException::ERROR_NOT_FOUND_DANGER
+                    );
+                
+                // there is no given parameter but exists default value
+                $correctParameters[$name] = $infoAboutParameter['default'];
+            } else {
+                // there is given parameter for this name
+                $correctParameters[$name] = $this->givenParameters[$name];
             }
+            
+            $expectedType = $controllerReflectionParametersByName[$name]->getType();
+            // verify type of parameter
+            if ($expectedType !== null && !$this->verifyType($correctParameters[$name], $expectedType->getName()))
+                throw new PlatformException(
+                    "'".$name."' parameter should be from ".$expectedType->getName()." type.",
+                    PlatformException::ERROR_NOT_FOUND_DANGER
+                );
         }
+        return $correctParameters;
     }
     
     /**
-     * if the current parameter ($myParameter) is provided by the user
+     * Get reflection parameters indexed by name of both constructor and method from controller
      *
-     * @param \ReflectionParameter $myParameter
-     * @param array $givenParameters
-     * @return bool
+     * @return array
      */
-    private function isParameterProvided(\ReflectionParameter $myParameter, array $givenParameters): bool
+    private function getControllerReflectionParametersByName(): array
     {
-        return array_key_exists($myParameter->getName(), $givenParameters);
-    }
-    
-    /**
-     * @param \ReflectionParameter $myParameter
-     * @return bool
-     */
-    private function hasDefault(\ReflectionParameter $myParameter): bool
-    {
-        return $this->route['parameters'][$myParameter->getName()]
-            && array_key_exists('default', $this->route['parameters'][$myParameter->getName()]);
+        $controllerReflectionParameters = array_merge(
+            array_slice(
+                $this->reflectionController->getConstructor()->getParameters(),
+                self::ARGS_DEFAULT_CONSTRUCTOR
+            ),
+            $this->reflectionMethod->getParameters()
+        );
+        
+        $controllerReflectionParametersByName = [];
+        foreach ($controllerReflectionParameters as $reflectionParameter) {
+            if ($reflectionParameter instanceof \ReflectionParameter)
+                $controllerReflectionParametersByName[$reflectionParameter->getName()] = $reflectionParameter;
+        }
+        return $controllerReflectionParametersByName;
     }
     
     /**
@@ -152,7 +230,7 @@ class ValidateController
      */
     private function verifyType($var, string $type): bool
     {
-        $typeFunctions = array(
+        $typeFunctions = [
             'boolean'   => ['boolval', 'is_bool'],
             'bool'      => ['boolval', 'is_bool'],
             'integer'   => ['intval', 'is_int'],
@@ -162,40 +240,14 @@ class ValidateController
             'string'    => ['strval', 'is_string'],
             'array'     => ['is_array'],
             'resource'  => ['is_resource']
-        );
-    
-        $isSameType = is_null($var);
-        if (!$isSameType && array_key_exists($type, $typeFunctions)) {
+        ];
+        
+        $isSameType = false;
+        if (array_key_exists($type, $typeFunctions)) {
             $isSameType = call_user_func($typeFunctions[$type][0], $var);
             if (count($typeFunctions[$type]) == 2)
                 $isSameType = call_user_func($typeFunctions[$type][1], $isSameType);
         }
         return $isSameType;
-    }
-    
-    /**
-     * @param \ReflectionParameter $myParameter
-     * @return bool
-     */
-    private function isSameTypeFromDefaultParameter(\ReflectionParameter $myParameter): bool
-    {
-        if ($this->hasDefault($myParameter)) {
-            return $myParameter->hasType()
-                && $this->verifyType(
-                    $this->route['parameters'][$myParameter->getName()]['default'],
-                    $myParameter->getType()->getName()
-                );
-        }
-        return false;
-    }
-    
-    /**
-     * @param \ReflectionParameter $myParameter
-     * @param $givenParameter
-     * @return bool
-     */
-    private function isSameTypeFromProvidedParameter(\ReflectionParameter $myParameter, $givenParameter): bool
-    {
-        return $myParameter->hasType() && $this->verifyType($givenParameter, $myParameter->getType()->getName());
     }
 }
