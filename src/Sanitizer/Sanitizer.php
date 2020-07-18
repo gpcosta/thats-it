@@ -30,7 +30,7 @@ class Sanitizer
      *
      * @note: Input is filtered with HTML Purifier, so please use it
      *        only when HTML input is expected. If only text is expected
-     *        use FILTER_TEXT_ONLY because this filter is computationally expensive
+     *        use SANITIZER_TEXT_ONLY because this filter is computationally expensive
      */
     const SANITIZER_HTML_SAFETY = 2;
     
