@@ -51,6 +51,11 @@ abstract class AbstractController
 	private $logger;
     
     /**
+     * @var null|CSRFToken
+     */
+    private $csrfToken;
+    
+    /**
      * AbstractController constructor.
      * @param string $environment
      * @param HttpRequest $request
@@ -71,8 +76,8 @@ abstract class AbstractController
 		$this->routes = $routes;
         $this->currentRoute = $currentRoute;
 		$this->logger = $logger;
-		
-		CSRFToken::setCSRFTokenFromCookies($request);
+        
+        $this->csrfToken = CSRFToken::getCSRFTokenFromCookies($request);
 	}
     
     /**
@@ -113,6 +118,14 @@ abstract class AbstractController
     protected function getLogger(): Logger
     {
         return $this->logger;
+    }
+    
+    /**
+     * @return null|CSRFToken
+     */
+    protected function getCsrfToken(): ?CSRFToken
+    {
+        return $this->csrfToken;
     }
     
     /**
