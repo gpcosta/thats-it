@@ -103,6 +103,7 @@ class EntryPoint
             $validateController->callConstructor($this->environment, $this->request,
                 $this->routes, $currentRoute, $this->logger);
             $response = $validateController->callMethod();
+            $response->setEnvironment($this->environment);
     
             $send = new SendResponse($response);
             $send->send();

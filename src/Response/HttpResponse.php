@@ -49,6 +49,11 @@ abstract class HttpResponse
     protected $variables = [];
     
     /**
+     * @var string
+     */
+    protected $environment = 'production';
+    
+    /**
      * @var array
      */
     private $statusTexts = [
@@ -248,6 +253,23 @@ abstract class HttpResponse
     public function getVariables(): array
     {
         return $this->variables;
+    }
+    
+    /**
+     * @param string $environment
+     */
+    public function setEnvironment(string $environment): void
+    {
+        if ($environment === 'production' || $environment === 'development')
+            $this->environment = $environment;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getEnvironment(): string
+    {
+        return $this->environment;
     }
     
     /**
