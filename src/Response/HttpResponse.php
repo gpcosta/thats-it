@@ -197,6 +197,18 @@ abstract class HttpResponse
     }
     
     /**
+     * @param string $name
+     * @return null|Cookie
+     */
+    public function getCookie(string $name): ?Cookie
+    {
+        if (array_key_exists($name, $this->cookies))
+            return $this->cookies[$name];
+        
+        return null;
+    }
+    
+    /**
      * Adds a new cookie.
      *
      * @param Cookie $cookie
@@ -204,6 +216,22 @@ abstract class HttpResponse
     public function addCookie(Cookie $cookie): void
     {
         $this->cookies[$cookie->getName()] = $cookie;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getCookies(): array
+    {
+        return $this->cookies;
+    }
+    
+    /**
+     * @param array $cookies
+     */
+    public function setCookies(array $cookies): void
+    {
+        $this->cookies = $cookies;
     }
     
     /**
