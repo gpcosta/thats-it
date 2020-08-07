@@ -60,10 +60,10 @@ class IDGenerator
      * To understand why this type of ID is important, please see the following article:
      *      - https://www.callicoder.com/distributed-unique-id-sequence-number-generator/
      *
-     * @return int
+     * @return string
      * @throws \ThatsIt\Exception\PlatformException
      */
-    public static function generateSnowflakeID(): int
+    public static function generateSnowflakeID(): string
     {
         $snowflakeConfig = Configurations::getSnowflakeConfig();
         $snowflake = new Snowflake($snowflakeConfig['datacenterId'], $snowflakeConfig['workerId']);
