@@ -36,27 +36,32 @@ class PlatformException extends \Exception
     /**
      * some resource was not found, but in this case some page is not accessible
      */
-    const ERROR_NOT_FOUND_DANGER = 1;
+    const ERROR_NOT_FOUND_DANGER = 2;
     
     /**
      * indicate problems with the response given by controller
      */
-    const ERROR_RESPONSE = 2;
+    const ERROR_RESPONSE = 3;
     
     /**
      * problems related to database
      */
-    const ERROR_DB = 3;
+    const ERROR_DB = 4;
     
     /**
      * when a config file it was needed but it was missing
      */
-    const ERROR_CONFIG_FILE_MISSING = 4;
+    const ERROR_CONFIG_FILE_MISSING = 5;
+    
+    /**
+     * when a config file exists, but there is some important configuration/line missing
+     */
+    const ERROR_CONFIG_LINE_MISSING = 6;
     
     /**
      * when a curl request fails
      */
-    const ERROR_CURL_REQUEST = 5;
+    const ERROR_CURL_REQUEST = 7;
     
     /**
      * PlatformException constructor.

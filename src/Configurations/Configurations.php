@@ -159,4 +159,17 @@ class Configurations
         }
         return self::$routesConfig;
     }
+    
+    /**
+     * @return string
+     * @throws PlatformException
+     */
+    public static function getDomain(): string
+    {
+        $config = self::getGeneralConfig();
+        if (!array_key_exists("domain", $config))
+            throw new PlatformException("There is no domain defined in config/config.php",
+                PlatformException::ERROR_CONFIG_LINE_MISSING);
+        return $config["domain"];
+    }
 }
