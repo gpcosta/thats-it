@@ -68,6 +68,9 @@ class IDGenerator
         $snowflakeConfig = Configurations::getSnowflakeConfig();
         $snowflake = new Snowflake($snowflakeConfig['datacenterId'], $snowflakeConfig['workerId']);
         $snowflake->setStartTimeStamp(strtotime('2020-06-01')*1000);
+        $snowflake->setSequenceResolver(function ($currentTime) {
+            return mt_rand(0, 4095);
+        });
         return $snowflake->id();
     }
 }
