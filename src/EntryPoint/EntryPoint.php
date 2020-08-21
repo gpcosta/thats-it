@@ -11,11 +11,8 @@ use ThatsIt\Exception\PlatformException;
 use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
-use ThatsIt\Response\HttpResponse;
 use ThatsIt\Response\SendResponse;
 use ThatsIt\Response\View;
-use ThatsIt\Sanitizer\ArrayOfInputsToSanitize;
-use ThatsIt\Sanitizer\InputToSanitize;
 use ThatsIt\Sanitizer\Sanitizer;
 
 /**
@@ -190,18 +187,10 @@ class EntryPoint
     private function getSanitizedParameters(array $givenParameters, array $currentRouteParameters): array
     {
         foreach ($givenParameters as $parameterName => $parameterValue) {
-            $sanitizerToUse = (isset($currentRouteParameters[$parameterName]['sanitizer']) ?
-                $currentRouteParameters[$parameterName]['sanitizer'] : Sanitizer::SANITIZER_TEXT_ONLY
+            $sanitizer = (isset($currentRouteParameters[$parameterName]['sanitizer']) ?
+                $currentRouteParameters[$parameterName]['sanitizer'] : Sanitizer::SANITIZER_NONE
             );
-            if (!is_array($parameterValue) && !is_object($parameterValue)) {
-                $givenParameters[$parameterName] = (new InputToSanitize(
-                    $parameterName, $parameterValue, $sanitizerToUse
-                ))->getSanitizedInput();
-            } else if (is_array($parameterValue)) {
-                $givenParameters[$parameterName] = (new ArrayOfInputsToSanitize(
-                    $parameterName, $parameterValue, $sanitizerToUse
-                ))->getSanitizedInput();
-            }
+            $givenParameters[$parameterName] = Sanitizer::sanitize($parameterValue, $sanitizer);
         }
         return $givenParameters;
     }
