@@ -63,4 +63,12 @@ class Folder
     {
         return self::$indexPath.'/../../log';
     }
+    
+    /**
+     * @return string
+     */
+    public static function getTranslationsFolder(): string
+    {
+        return self::getSourceFolder().'/translations';
+    }
 }
