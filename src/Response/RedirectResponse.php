@@ -27,9 +27,9 @@ class RedirectResponse extends HttpResponse
     public function __construct(string $url, int $statusCode = 302)
     {
         $this->url = $url;
-        if ($statusCode < 300 && $statusCode >= 400) $statusCode = 302;
-        $this->statusCode = $statusCode;
-    
+        if ($statusCode < 300 && $statusCode >= 400)
+            $statusCode = 302;
+        
         $this->setHeader('Location', $this->url);
         $this->setStatusCode($this->statusCode);
     }

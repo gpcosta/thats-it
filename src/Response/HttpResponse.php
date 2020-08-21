@@ -8,6 +8,10 @@
 
 namespace ThatsIt\Response;
 
+use ThatsIt\Controller\AbstractController;
+use ThatsIt\Sanitizer\Sanitizer;
+use ThatsIt\Translation\Translator;
+
 /**
  * Inspired heavily in patricklouys/http (https://github.com/PatrickLouys/http)
  * See: https://github.com/PatrickLouys/http/blob/master/src/HttpResponse.php
@@ -51,7 +55,17 @@ abstract class HttpResponse
     /**
      * @var string
      */
-    protected $environment = 'production';
+    protected $environment = AbstractController::ENVIRONMENT_PROD;
+    
+    /**
+     * @var int - constant from Sanitizer
+     */
+    protected $sanitizer = Sanitizer::SANITIZER_NONE;
+    
+    /**
+     * @var null|Translator
+     */
+    protected $translator = null;
     
     /**
      * @var array
@@ -288,7 +302,10 @@ abstract class HttpResponse
      */
     public function setEnvironment(string $environment): void
     {
-        if ($environment === 'production' || $environment === 'development')
+        if (
+            $environment === AbstractController::ENVIRONMENT_PROD ||
+            $environment === AbstractController::ENVIRONMENT_DEV
+        )
             $this->environment = $environment;
     }
     
@@ -298,6 +315,58 @@ abstract class HttpResponse
     public function getEnvironment(): string
     {
         return $this->environment;
+    }
+    
+    /**
+     * @param Translator $translator
+     */
+    public function setTranslator(Translator $translator): void
+    {
+        $this->translator = $translator;
+    }
+    
+    /**
+     * @return Translator
+     */
+    public function getTranslator(): Translator
+    {
+        return $this->translator;
+    }
+    
+    /**
+     * @param int $sanitizer
+     */
+    public function setSanitizer(int $sanitizer): void
+    {
+        $this->sanitizer = $sanitizer;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getSanitizer(): int
+    {
+        return $this->sanitizer;
+    }
+    
+    /**
+     * @param string $token
+     * @return string
+     */
+    public function translation(string $token): string
+    {
+        if (!$this->translator)
+            return $token;
+        return $this->translator->translate($token);
+    }
+    
+    /**
+     * @param string $token
+     * @return string
+     */
+    public function t(string $token): string
+    {
+        return $this->translation($token);
     }
     
     /**

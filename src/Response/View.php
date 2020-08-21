@@ -10,6 +10,7 @@ namespace ThatsIt\Response;
 
 use ThatsIt\Folder\Folder;
 use ThatsIt\Response\Component\AppComponent;
+use ThatsIt\Sanitizer\Sanitizer;
 
 /**
  * Class View
@@ -28,11 +29,6 @@ class View extends HttpResponse
     private $component;
     
     /**
-     * @var array
-     */
-    private $routes;
-    
-    /**
      * View constructor.
      * @param $viewOrComponent - if it's a string, it is interpreted as the name of a view
      *                           else if it's a Component, it is used as Component
@@ -46,6 +42,7 @@ class View extends HttpResponse
             $this->pageToShow = $viewOrComponent;
             $this->component = null;
         }
+        $this->setSanitizer(Sanitizer::SANITIZER_HTML_ENCODE);
     }
     
     /**
@@ -54,10 +51,24 @@ class View extends HttpResponse
     public function getContent(): string
     {
         $content = "";
+    
+        // sanitize and encode all variables passed to View
+        if ($this->sanitizer !== Sanitizer::SANITIZER_NONE) {
+            foreach ($this->variables as $key => $value) {
+                $this->variables[$key] = Sanitizer::sanitize($value, $this->sanitizer);
+            }
+        }
+        
         // if there is a page to show, it will show it
         if ($this->pageToShow) {
-            ob_start();
             extract($this->variables);
+            $t = function(string $token) {
+                if ($this->translator)
+                    return $this->translator->translate($token);
+                else
+                    return $token;
+            };
+            ob_start();
             require_once(Folder::getSourceFolder().'/View/'.$this->pageToShow.'.php');
             $content = ob_get_clean();
         }
