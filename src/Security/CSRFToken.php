@@ -6,7 +6,7 @@
  * Time: 15:54
  */
 
-namespace ThatsIt\Session;
+namespace ThatsIt\Security;
 
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\Cookie;
