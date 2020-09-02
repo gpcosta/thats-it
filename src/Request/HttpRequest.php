@@ -248,10 +248,10 @@ class HttpRequest
     /**
      * The URI which was given in order to access this page
      *
-     * @return mixed
+     * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->getServerVariable('REQUEST_URI');
     }
@@ -262,7 +262,7 @@ class HttpRequest
      * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getPath()
+    public function getPath(): string
     {
         return strtok($this->getServerVariable('REQUEST_URI'), '?');
     }
@@ -271,10 +271,10 @@ class HttpRequest
      * Which request method was used to access the page;
      * i.e. 'GET', 'POST', 'PUT', 'DELETE'.
      *
-     * @return mixed
+     * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         $method = $this->getServerVariable('REQUEST_METHOD');
         if ($this->getParameter("_method")) {
@@ -290,7 +290,7 @@ class HttpRequest
      * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getHost(bool $withHttp = true)
+    public function getHost(bool $withHttp = true): string
     {
         $host = $this->getServerVariable('HTTP_HOST');
         if ($withHttp)
@@ -305,7 +305,7 @@ class HttpRequest
     {
         // If the request was sent with HTTPS you will have a extra parameter in the $_SERVER superglobal - $_SERVER['HTTPS']
         $httpOrHttps = "http";
-        if (isset($_SERVER['HTTPS'])) $httpOrHttps .= "s";
+        if ($this->isSecure()) $httpOrHttps .= "s";
         return $httpOrHttps;
     }
     
@@ -315,7 +315,7 @@ class HttpRequest
      * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getHttpAccept()
+    public function getHttpAccept(): string
     {
         return $this->getServerVariable('HTTP_ACCEPT');
     }
@@ -327,7 +327,7 @@ class HttpRequest
      * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getReferer()
+    public function getReferer(): string
     {
         return $this->getServerVariable('HTTP_REFERER');
     }
@@ -338,7 +338,7 @@ class HttpRequest
      * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getUserAgent()
+    public function getUserAgent(): string
     {
         return $this->getServerVariable('HTTP_USER_AGENT');
     }
@@ -349,17 +349,31 @@ class HttpRequest
      * @return string
      * @throws MissingRequestMetaVariableException
      */
-    public function getIpAddress()
+    public function getIpAddress(): string
     {
         return $this->getServerVariable('REMOTE_ADDR');
     }
     
     /**
+     * Obtain the several suggested languages by the browser for the current user
+     * All suggested languages have a suitability coefficient (q) for the current user
+     * When q coefficent is not present, q = 1
+     * Example of the format: en-ca,en;q=0.8,en-us;q=0.6,de-de;q=0.4,de;q=0.2
+     *
+     * @return string
+     * @throws MissingRequestMetaVariableException
+     */
+    public function getBrowserLanguage(): string
+    {
+        return $this->getServerVariable('HTTP_ACCEPT_LANGUAGE');
+    }
+    
+    /**
      * Checks to see whether the current request is using HTTPS.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         return (array_key_exists('HTTPS', $this->server)
             && $this->server['HTTPS'] !== 'off'
