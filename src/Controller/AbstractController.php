@@ -5,11 +5,9 @@ namespace ThatsIt\Controller;
 use \PDO;
 use ThatsIt\Database\Database;
 use ThatsIt\Exception\PlatformException;
-use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
-use ThatsIt\Response\RedirectResponse;
-use ThatsIt\Session\CSRFToken;
+use ThatsIt\Security\CSRFToken;
 
 /**
  * Class AbstractController
