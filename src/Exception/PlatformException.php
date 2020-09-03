@@ -34,7 +34,7 @@ class PlatformException extends \Exception
     const ERROR_NOT_FOUND_SOFT = 1;
     
     /**
-     * some resource was not found, but in this case some page is not accessible
+     * some resource was not found, but in this case some page or file is not accessible
      */
     const ERROR_NOT_FOUND_DANGER = 2;
     
@@ -62,6 +62,11 @@ class PlatformException extends \Exception
      * when a curl request fails
      */
     const ERROR_CURL_REQUEST = 7;
+    
+    /**
+     * when a parameter passed is not valid in the context of the current function
+     */
+    const ERROR_PARAMETER_NOT_VALID = 8;
     
     /**
      * PlatformException constructor.
