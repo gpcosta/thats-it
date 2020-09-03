@@ -175,16 +175,113 @@ class FunctionsBag
     }
     
     /**
-     * Get $date1 - $date2
+     * Get $date1 - $date2 in $diffUnit
      *
      * @param string $date1
      * @param string $date2
+     * @param string $diffUnit - "years", "months", "days", "hours", "minutes", "seconds"
      * @return int
+     * @throws PlatformException
+     *
+     * @note: Between $date1 = "2020-09-03 12:00:00" and $date2 = "2020-09-04 11:00:00" with $diffUnit = "days"
+     *        will return 0 days. If you want that a method call with such parameters return 1 day,
+     *        please use self::getDifferenceBetweenUnitTime()
      */
-    public static function getDifferenceBetweenDates(string $date1, string $date2): int
+    public static function getDifferenceBetweenDates(string $date1, string $date2, string $diffUnit = 'days'): int
     {
-        $date1 = new \DateTime($date1);
+        $diffUnitEqualOrBelowDays = false;
+        
+        $yearMultiplier = 0;
+        $monthMultiplier = 0;
+        $dayMultiplier = 0;
+        $hourMultiplier = 0;
+        $minuteMultiplier = 0;
+        $secondMultiplier = 0;
+        switch ($diffUnit) {
+            case 'years':
+                $yearMultiplier = 1;
+                break;
+            case 'months':
+                $yearMultiplier = 12;
+                $monthMultiplier = 1;
+                break;
+            case 'days':
+                $dayMultiplier = 1;
+                $diffUnitEqualOrBelowDays = true;
+                break;
+            case 'hours':
+                $hourMultiplier = 1;
+                $dayMultiplier = 24;
+                $diffUnitEqualOrBelowDays = true;
+                break;
+            case 'minutes':
+                $minuteMultiplier = 1;
+                $hourMultiplier = 60;
+                $dayMultiplier = 24 * 60;
+                $diffUnitEqualOrBelowDays = true;
+                break;
+            case 'seconds':
+                $secondMultiplier = 1;
+                $minuteMultiplier = 60;
+                $hourMultiplier = 24 * 60;
+                $dayMultiplier = 24 * 60 * 60;
+                $diffUnitEqualOrBelowDays = true;
+                break;
+            default:
+                throw new PlatformException('formatDiff parameter is not possible. '.
+                    'Please, see which strings you can use as formatDiff parameter.',
+                    PlatformException::ERROR_PARAMETER_NOT_VALID);
+        }
+        
+        $date1 = (new \DateTime($date1));
         $date2 = new \DateTime($date2);
-        return (int) $date2->diff($date1)->format("%r%a");
+        $diff = $date2->diff($date1);
+        
+        if ($diffUnitEqualOrBelowDays)
+            return ($diff->invert ? -1 : 1) * ($diff->days * $dayMultiplier + $diff->h * $hourMultiplier +
+                    $diff->i * $minuteMultiplier + $diff->s * $secondMultiplier);
+        else
+            return ($diff->invert ? -1 : 1) * ($diff->y * $yearMultiplier + $diff->m * $monthMultiplier);
+    }
+    
+    /**
+     * Get $date1 - $date2 in $diffUnit
+     *
+     * @param string $date1
+     * @param string $date2
+     * @param string $diffUnit
+     * @return int
+     * @throws PlatformException
+     *
+     * @note: Between $date1 = "2020-09-03 12:00:00" and $date2 = "2020-09-04 11:00:00" with $diffUnit = "days"
+     *        will return 1 day. If you want that a method call with such parameters return 0 days,
+     *        please use self::getDifferenceBetweenDates()
+     */
+    public static function getDifferenceBetweenUnitTimes(string $date1, string $date2, string $diffUnit = 'days'): int
+    {
+        switch ($diffUnit) {
+            case 'years':
+                return (int) (new \DateTime($date1))->format('Y') - (int) (new \DateTime($date2))->format('Y');
+            case 'months':
+                return self::getDifferenceBetweenUnitTime($date1, $date2, 'years') * 12 +
+                    ((int) (new \DateTime($date1))->format('n') - (int) (new \DateTime($date2))->format('n'));
+            case 'days':
+                $date1 = new \DateTime((new \DateTime($date1))->format('Y-m-d'));
+                $date2 = new \DateTime((new \DateTime($date2))->format('Y-m-d'));
+                return (int) $date2->diff($date1)->format('%r%a');
+            case 'hours':
+                return self::getDifferenceBetweenUnitTime($date1, $date2, 'days') * 24 +
+                    ((int) (new \DateTime($date1))->format('G') - (int) (new \DateTime($date2))->format('G'));
+            case 'minutes':
+                return self::getDifferenceBetweenUnitTime($date1, $date2, 'hours') * 60 +
+                    ((int) (new \DateTime($date1))->format('i') - (int) (new \DateTime($date2))->format('i'));
+            case 'seconds':
+                return self::getDifferenceBetweenUnitTime($date1, $date2, 'minutes') * 60 +
+                    ((int) (new \DateTime($date1))->format('s') - (int) (new \DateTime($date2))->format('s'));
+            default:
+                throw new PlatformException('formatDiff parameter is not possible. '.
+                    'Please, see which strings you can use as formatDiff parameter.',
+                    PlatformException::ERROR_PARAMETER_NOT_VALID);
+        }
     }
 }
