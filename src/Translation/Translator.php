@@ -9,7 +9,7 @@
 namespace ThatsIt\Translation;
 
 use ThatsIt\Configurations\Configurations;
-use ThatsIt\Exception\ClientException;
+use ThatsIt\Exception\PlatformException;
 use ThatsIt\Folder\Folder;
 
 /**
@@ -32,8 +32,7 @@ class Translator
      * Translator constructor.
      * @param string $translationFilename
      * @param string|null $locale
-     * @throws ClientException
-     * @throws \ThatsIt\Exception\PlatformException
+     * @throws PlatformException
      */
     public function __construct(string $translationFilename, string $locale = null)
     {
@@ -45,9 +44,9 @@ class Translator
             $this->locale = $config['fallbackLocale'];
             $translationFilePathFallback = $this->getPathToTranslationFile($this->locale, $translationFilename);
         } else {
-            throw new ClientException(
+            throw new PlatformException(
                 'You must provide a locale to Translator or define a fallbackLocale at config.php.',
-                404
+                PlatformException::ERROR_CONFIG_LINE_MISSING
             );
         }
         
@@ -61,10 +60,10 @@ class Translator
         else if ($translationFilePathFallback && file_exists($translationFilePathFallback))
             $this->translationFile = require($translationFilePathFallback);
         else
-            throw new ClientException(
+            throw new PlatformException(
                 'You must provide a valid translationFilename and '.
                 'a valid locale to Translator or define a valid fallbackLocale at config.php.',
-                404
+                PlatformException::ERROR_NOT_FOUND_DANGER
             );
     }
     
@@ -91,7 +90,6 @@ class Translator
      * If there is no translation possible, token is returned
      *
      * @param string $token
-     * @param string|null $locale
      * @return string
      */
     public function translate(string $token): string
@@ -105,7 +103,6 @@ class Translator
      * @param string $locale
      * @param string $translationFilename
      * @return string
-     * @throws \ThatsIt\Exception\PlatformException
      */
     private function getPathToTranslationFile(string $locale, string $translationFilename): string
     {
