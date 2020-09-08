@@ -263,20 +263,20 @@ class FunctionsBag
             case 'years':
                 return (int) (new \DateTime($date1))->format('Y') - (int) (new \DateTime($date2))->format('Y');
             case 'months':
-                return self::getDifferenceBetweenUnitTime($date1, $date2, 'years') * 12 +
+                return self::getDifferenceBetweenUnitTimes($date1, $date2, 'years') * 12 +
                     ((int) (new \DateTime($date1))->format('n') - (int) (new \DateTime($date2))->format('n'));
             case 'days':
                 $date1 = new \DateTime((new \DateTime($date1))->format('Y-m-d'));
                 $date2 = new \DateTime((new \DateTime($date2))->format('Y-m-d'));
                 return (int) $date2->diff($date1)->format('%r%a');
             case 'hours':
-                return self::getDifferenceBetweenUnitTime($date1, $date2, 'days') * 24 +
+                return self::getDifferenceBetweenUnitTimes($date1, $date2, 'days') * 24 +
                     ((int) (new \DateTime($date1))->format('G') - (int) (new \DateTime($date2))->format('G'));
             case 'minutes':
-                return self::getDifferenceBetweenUnitTime($date1, $date2, 'hours') * 60 +
+                return self::getDifferenceBetweenUnitTimes($date1, $date2, 'hours') * 60 +
                     ((int) (new \DateTime($date1))->format('i') - (int) (new \DateTime($date2))->format('i'));
             case 'seconds':
-                return self::getDifferenceBetweenUnitTime($date1, $date2, 'minutes') * 60 +
+                return self::getDifferenceBetweenUnitTimes($date1, $date2, 'minutes') * 60 +
                     ((int) (new \DateTime($date1))->format('s') - (int) (new \DateTime($date2))->format('s'));
             default:
                 throw new PlatformException('formatDiff parameter is not possible. '.
