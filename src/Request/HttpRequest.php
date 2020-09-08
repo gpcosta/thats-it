@@ -157,6 +157,20 @@ class HttpRequest
         }
         return $defaultValue;
     }
+    /**
+     * Returns a file value or a default value if none is set.
+     *
+     * @param $key
+     * @return UploadedFile|null
+     */
+    public function getFileAsFile($key): ?UploadedFile
+    {
+        $file = $this->getFile($key, null);
+        if ($file === null)
+            return null;
+        
+        return new UploadedFile($file);
+    }
     
     /**
      * Returns a cookie value or a default value if none is set.
