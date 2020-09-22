@@ -94,9 +94,10 @@ class Translator
      */
     public function translate(string $token): string
     {
-        if (!is_array($this->translationFile) || !array_key_exists($token, $this->translationFile))
+        $lowerToken = strtolower($token);
+        if (!is_array($this->translationFile) || !array_key_exists($lowerToken, $this->translationFile))
             return $token;
-        return $this->translationFile[$token];
+        return $this->translationFile[$lowerToken];
     }
     
     /**
