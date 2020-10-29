@@ -89,7 +89,11 @@ class FunctionsBag
 		$path = $routes[$name]['path'];
 		// will substitute all variables for their value
 		foreach ($variables as $name => $value) {
-			// limit: -1 is the same as no limit; $count will no how many replaces happened
+			// arrays are only used as GET (or query) parameters
+			if (is_array($value))
+				continue;
+			
+			// limit: -1 is the same as no limit; $count will know how many replaces happened
 			$path = preg_replace("/\{" . $name . "(\:.*){0,1}\}/U", $value, $path, -1, $count);
 			// if any replace happened, this variable is already used
 			// if not, this variable should be added to path as a GET parameter
@@ -99,16 +103,19 @@ class FunctionsBag
 		// remove all variables already set in url (this step was not made in last foreach just as a safety measure)
 		foreach ($alreadyUsedVariablesInPath as $variableName) unset($variables[$variableName]);
 		
-		// will add get variables (this variables are the remain ones from $variables that were not set in $path already)
-		if (count($variables) > 0) $path .= "?" . http_build_query($variables);
-		
 		if ($withOptional) {
-			// if so removes just parenthesis
+			// if so removes just brackets
 			$path = preg_replace("/\[|\]/", "", $path);
 		} else {
-			// else removes everything that is inside of parenthesis
+			// else removes everything that is inside of brackets
 			$path = preg_replace("/\[.*\]/", "", $path);
 		}
+		
+		// will add get variables (this variables are the remain ones from $variables that were not set in $path already)
+		// http_build_query construct a url based in $variables passed to it
+		// preg_replace replaces the escaped brackets with an index and real brackets without index
+		if (count($variables) > 0)
+			$path .= "?" . preg_replace('/\%5B\d+\%5D/', '[]', http_build_query($variables));
 		
 		// if there are some more variables to substitute, it will raise a exception
 		preg_match("/\{.*\}/", $path, $matches);
