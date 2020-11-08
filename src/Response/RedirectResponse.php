@@ -71,6 +71,6 @@ class RedirectResponse extends HttpResponse
      */
     private function getNewUrl(): string
     {
-        return (strpos($this->url, '?') !== false ? $this->url : $this->url.'?').http_build_query($this->variables);
+        return (strpos($this->url, '?') !== false ? $this->url.'&' : $this->url.'?').http_build_query($this->variables);
     }
 }
