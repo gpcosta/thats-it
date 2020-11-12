@@ -34,16 +34,6 @@ abstract class AbstractController
 	private $request;
 	
 	/**
-	 * @var array
-	 */
-	private $routes;
-	
-	/**
-	 * @var array
-	 */
-	private $currentRoute;
-	
-	/**
 	 * @var Logger
 	 */
 	private $logger;
@@ -57,12 +47,10 @@ abstract class AbstractController
 	 * AbstractController constructor.
 	 * @param string $environment
 	 * @param HttpRequest $request
-	 * @param array $routes
-	 * @param array $currentRoute
 	 * @param Logger $logger
 	 * @throws PlatformException
 	 */
-	public function __construct(string $environment, HttpRequest $request, array $routes, array $currentRoute, Logger $logger)
+	public function __construct(string $environment, HttpRequest $request, Logger $logger)
 	{
 		$this->db = new Database();
 		if (in_array($environment, [self::ENVIRONMENT_DEV, self::ENVIRONMENT_PROD])) {
@@ -71,8 +59,6 @@ abstract class AbstractController
 			$this->environment = self::ENVIRONMENT_PROD;
 		}
 		$this->request = $request;
-		$this->routes = $routes;
-		$this->currentRoute = $currentRoute;
 		$this->logger = $logger;
 		
 		$this->csrfToken = CSRFToken::getCSRFTokenFromCookies($request);
@@ -92,22 +78,6 @@ abstract class AbstractController
 	protected function getRequest(): HttpRequest
 	{
 		return $this->request;
-	}
-	
-	/**
-	 * @return array
-	 */
-	protected function getRoutes(): array
-	{
-		return $this->routes;
-	}
-	
-	/**
-	 * @return array
-	 */
-	protected function getCurrentRoute(): array
-	{
-		return $this->currentRoute;
 	}
 	
 	/**

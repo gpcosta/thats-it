@@ -60,8 +60,6 @@ class Door
     
         $entryPoint = new EntryPoint(
             new HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER, file_get_contents('php://input')),
-            Configurations::getRoutesConfig(),
-            $generalConfig,
             $environment
         );
         $entryPoint->callController();

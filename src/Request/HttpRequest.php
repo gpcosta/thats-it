@@ -8,7 +8,12 @@
 
 namespace ThatsIt\Request;
 
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
+use function FastRoute\simpleDispatcher;
+use ThatsIt\Configurations\Configurations;
 use ThatsIt\Request\Exception\MissingRequestMetaVariableException;
+use ThatsIt\Sanitizer\Sanitizer;
 
 /**
  * Inspired heavily in patricklouys/http (https://github.com/PatrickLouys/http)
@@ -23,17 +28,17 @@ class HttpRequest
 	/**
 	 * @var array
 	 */
+	protected $currentRoute;
+	
+	/**
+	 * @var array
+	 */
 	protected $getParameters;
 	
 	/**
 	 * @var array
 	 */
 	protected $postParameters;
-	
-	/**
-	 * @var array
-	 */
-	protected $putParameters;
 	
 	/**
 	 * @var array
@@ -55,18 +60,20 @@ class HttpRequest
 	 */
 	protected $inputStream;
 	
-	public function __construct(
-		array $get,
-		array $post,
-		array $cookies,
-		array $files,
-		array $server,
-		string $inputStream = ''
-	)
+	/**
+	 * HttpRequest constructor.
+	 * @param array $get
+	 * @param array $post
+	 * @param array $cookies
+	 * @param array $files
+	 * @param array $server
+	 * @param string $inputStream
+	 */
+	public function __construct(array $get, array $post, array $cookies, array $files, array $server,
+								 string $inputStream = '')
 	{
-		$this->getParameters = $get;
-		$this->postParameters = $post;
-		parse_str($inputStream, $this->putParameters);
+		$this->getParameters = $this->getSanitizedParameters($get);
+		$this->postParameters = $this->getSanitizedParameters($post);
 		$this->cookies = $cookies;
 		$this->files = [];
 		foreach ($files as $key => $file) {
@@ -76,6 +83,78 @@ class HttpRequest
 		}
 		$this->server = $server;
 		$this->inputStream = $inputStream;
+		
+		$routeAndVars = $this->getChosenRouteAndVars(Configurations::getRoutesConfig());
+		$this->currentRoute = $routeAndVars['route'];
+		$this->getParameters = array_merge($this->getParameters, $routeAndVars['vars']);
+	}
+	
+	/**
+	 * @param array $routes
+	 * @return array['route', 'vars' => [...]]
+	 * @throws \Exception
+	 */
+	private function getChosenRouteAndVars(array $routes): array
+	{
+		$toReturn = ['route' => null, 'vars' => array()];
+		$routeInfo = $this->getDispatcher($routes)->dispatch($this->getMethod(), $this->getPath());
+		switch ($routeInfo[0]) {
+			case Dispatcher::NOT_FOUND:
+				throw new ClientException("Not found what was requested.", 404);
+				break;
+			case Dispatcher::METHOD_NOT_ALLOWED:
+				$allowedMethods = $routeInfo[1];
+				throw new ClientException("The http method used is not valid. The only valid ones are " .
+					implode(", ", $allowedMethods) . ".", 405);
+				break;
+			case Dispatcher::FOUND:
+				$toReturn['route'] = $routeInfo[1];
+				$toReturn['vars'] = $routeInfo[2];
+				break;
+		}
+		
+		return $toReturn;
+	}
+	
+	/**
+	 * @param array $routes
+	 * @return Dispatcher
+	 */
+	private function getDispatcher(array $routes): Dispatcher
+	{
+		return simpleDispatcher(function (RouteCollector $r) use ($routes) {
+			foreach ($routes as $routeName => $route) {
+				$handler = new Route($routeName, $route);
+				$r->addRoute($route['httpMethods'], $route['path'], $handler);
+			}
+		});
+	}
+	
+	/**
+	 * Sanitize $givenParameters with the provided sanitizer
+	 * methods provided by $currentRouteParameters
+	 *
+	 * @param array $givenParameters
+	 * @param array $currentRouteParameters
+	 * @return array
+	 */
+	private function getSanitizedParameters(array $givenParameters): array
+	{
+		foreach ($givenParameters as $parameterName => $parameterValue) {
+			$sanitizer = (isset($currentRouteParameters[$parameterName]['sanitizer']) ?
+				$currentRouteParameters[$parameterName]['sanitizer'] : Sanitizer::SANITIZER_NONE
+			);
+			$givenParameters[$parameterName] = Sanitizer::sanitize($parameterValue, $sanitizer);
+		}
+		return $givenParameters;
+	}
+	
+	/**
+	 * @return Route
+	 */
+	public function getCurrentRoute(): Route
+	{
+		return $this->currentRoute;
 	}
 	
 	/**
@@ -89,9 +168,6 @@ class HttpRequest
 	{
 		if (array_key_exists($key, $this->postParameters)) {
 			return $this->postParameters[$key];
-		}
-		if (array_key_exists($key, $this->putParameters)) {
-			return $this->putParameters[$key];
 		}
 		if (array_key_exists($key, $this->getParameters)) {
 			return $this->getParameters[$key];
@@ -125,21 +201,6 @@ class HttpRequest
 	{
 		if (array_key_exists($key, $this->postParameters)) {
 			return $this->postParameters[$key];
-		}
-		return $defaultValue;
-	}
-	
-	/**
-	 * Returns a put parameter value or a default value if none is set.
-	 *
-	 * @param $key
-	 * @param null $defaultValue
-	 * @return mixed|null
-	 */
-	public function getPutParameter($key, $defaultValue = null)
-	{
-		if (array_key_exists($key, $this->putParameters)) {
-			return $this->putParameters[$key];
 		}
 		return $defaultValue;
 	}
@@ -197,7 +258,7 @@ class HttpRequest
 	public function getParameters(): array
 	{
 		return array_merge(
-			$this->getParameters, $this->postParameters, $this->putParameters, $this->files
+			$this->getParameters, $this->postParameters, $this->files
 		);
 	}
 	
@@ -219,16 +280,6 @@ class HttpRequest
 	public function getBodyParameters(): array
 	{
 		return $this->postParameters;
-	}
-	
-	/**
-	 * Returns all put parameters.
-	 *
-	 * @return array
-	 */
-	public function getPutParameters(): array
-	{
-		return $this->putParameters;
 	}
 	
 	/**

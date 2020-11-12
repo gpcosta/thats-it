@@ -24,7 +24,7 @@ class ValidateController
 	 * this means that constructor takes at least this number of arguments
 	 * and can take some more, for example variables passed as parameters from a request
 	 */
-	private const ARGS_DEFAULT_CONSTRUCTOR = 5;
+	private const ARGS_DEFAULT_CONSTRUCTOR = 3;
 	
 	/**
 	 * @var array
@@ -80,41 +80,30 @@ class ValidateController
 	 * @throws PlatformException
 	 * @throws \ReflectionException
 	 */
-	public function __construct(string $controllerName, string $methodName, array $routeParameters,
-								array $givenParameters)
+	public function __construct(HttpRequest $request)
 	{
-		$this->controllerName = $controllerName;
-		$this->reflectionController = new \ReflectionClass($this->controllerName);
+		$this->controllerName = $request->getCurrentRoute()->getController();
+		$this->reflectionController = new \ReflectionClass($request->getCurrentRoute()->getController());
 		$this->controller = null;
-		$this->methodName = $methodName;
+		$this->methodName = $request->getCurrentRoute()->getFunction();
 		$this->reflectionMethod = $this->reflectionController->getMethod($this->methodName);
-		$this->routeParameters = $routeParameters;
-		$this->givenParameters = $givenParameters;
+		$this->routeParameters = $request->getCurrentRoute()->getParameters();
+		$this->givenParameters = $request->getParameters();
 		$this->correctParameters = $this->getCorrectParameters();
 	}
 	
 	/**
 	 * @param string $environment
 	 * @param HttpRequest $request
-	 * @param array $routes
-	 * @param array|null $currentRoute
 	 * @param Logger $logger
 	 * @return ValidateController
-	 * @throws PlatformException
 	 */
-	public function callConstructor(string $environment, HttpRequest $request, array $routes,
-									?array $currentRoute, Logger $logger): self
+	public function callConstructor(string $environment, HttpRequest $request, Logger $logger): self
 	{
 		$constructorParameters = $this->reflectionController->getConstructor()->getParameters();
-		$args = [$environment, $request, $routes, $currentRoute, $logger];
+		$args = [$environment, $request, $logger];
 		for ($i = self::ARGS_DEFAULT_CONSTRUCTOR, $len = count($constructorParameters); $i < $len; $i++) {
 			$parameter = $constructorParameters[$i];
-			if (!array_key_exists($parameter->getName(), $this->correctParameters))
-				throw new PlatformException(
-					'Controller constructor has parameters that were not passed.',
-					400
-				);
-			
 			$args[] = $this->correctParameters[$parameter->getName()];
 		}
 		$this->controller = $this->reflectionController->newInstanceArgs($args);

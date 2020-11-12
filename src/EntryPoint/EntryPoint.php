@@ -52,15 +52,11 @@ class EntryPoint
 	/**
 	 * EntryPoint constructor.
 	 * @param HttpRequest $request
-	 * @param array $routes
-	 * @param array $generalConfig
 	 * @param string $environment
 	 */
-	public function __construct(HttpRequest $request, array $routes, array $generalConfig, string $environment)
+	public function __construct(HttpRequest $request, string $environment)
 	{
 		$this->request = $request;
-		$this->routes = $routes;
-		$this->generalConfig = $generalConfig;
 		$this->environment = $environment;
 		
 		try {
@@ -92,22 +88,8 @@ class EntryPoint
 	public function callController()
 	{
 		try {
-			FunctionsBag::setHttpHost($this->request->getHost());
-			$info = $this->getControllerAndFunction();
-			$currentRoute = $this->findRoute($info['controller'], $info['function']);
-			if ($currentRoute === null) {
-				throw new PlatformException(
-					"There is no such route.",
-					PlatformException::ERROR_NOT_FOUND_DANGER
-				);
-			}
-			
-			$givenParameters = array_merge($this->request->getParameters(), $info['vars']);
-			$sanitizedParameters = $this->getSanitizedParameters($givenParameters, $currentRoute['parameters']);
-			$validateController = new ValidateController($currentRoute['controller'], $currentRoute['function'],
-				$currentRoute['parameters'], $sanitizedParameters);
-			$validateController->callConstructor($this->environment, $this->request,
-				$this->routes, $currentRoute, $this->logger);
+			$validateController = new ValidateController($this->request);
+			$validateController->callConstructor($this->environment, $this->request, $this->logger);
 			$response = $validateController->callMethod();
 			$response->setEnvironment($this->environment);
 			
@@ -149,88 +131,6 @@ class EntryPoint
 				throw $e;
 			}
 		}
-	}
-	
-	/**
-	 * @return Dispatcher
-	 */
-	private function getDispatcher(): Dispatcher
-	{
-		return simpleDispatcher(function (RouteCollector $r) {
-			foreach ($this->routes as $routeName => $route) {
-				$handler = array(
-					'controller' => $route['controller'],
-					'function' => $route['function']
-				);
-				$r->addRoute($route['httpMethods'], $route['path'], $handler);
-			}
-		});
-	}
-	
-	/**
-	 * @return array['routeName', 'controller', 'function', 'vars' => [...]]
-	 * @throws \Exception
-	 */
-	private function getControllerAndFunction(): array
-	{
-		$toReturn = ['controller' => null, 'function' => null, 'vars' => array()];
-		$routeInfo = $this->getDispatcher()->dispatch($this->request->getMethod(), $this->request->getPath());
-		switch ($routeInfo[0]) {
-			case Dispatcher::NOT_FOUND:
-				throw new ClientException("Not found what was requested.", 404);
-				break;
-			case Dispatcher::METHOD_NOT_ALLOWED:
-				$allowedMethods = $routeInfo[1];
-				throw new ClientException("The http method used is not valid. The only valid ones are " .
-					implode(", ", $allowedMethods) . ".", 405);
-				break;
-			case Dispatcher::FOUND:
-				$handler = $routeInfo[1];
-				
-				$vars = $routeInfo[2];
-				$toReturn['controller'] = $handler['controller'];
-				$toReturn['function'] = $handler['function'];
-				$toReturn['vars'] = $vars;
-				
-				break;
-		}
-		
-		return $toReturn;
-	}
-	
-	/**
-	 * Sanitize $givenParameters with the provided sanitizer
-	 * methods provided by $currentRouteParameters
-	 *
-	 * @param array $givenParameters
-	 * @param array $currentRouteParameters
-	 * @return array
-	 */
-	private function getSanitizedParameters(array $givenParameters, array $currentRouteParameters): array
-	{
-		foreach ($givenParameters as $parameterName => $parameterValue) {
-			$sanitizer = (isset($currentRouteParameters[$parameterName]['sanitizer']) ?
-				$currentRouteParameters[$parameterName]['sanitizer'] : Sanitizer::SANITIZER_NONE
-			);
-			$givenParameters[$parameterName] = Sanitizer::sanitize($parameterValue, $sanitizer);
-		}
-		return $givenParameters;
-	}
-	
-	/**
-	 * @param string $controllerName
-	 * @param string $functionName
-	 * @return array|null
-	 */
-	private function findRoute(string $controllerName, string $functionName): ?array
-	{
-		foreach ($this->routes as $routeName => $route) {
-			if ($route['controller'] == $controllerName && $route['function'] == $functionName) {
-				$route['routeName'] = $routeName;
-				return $route;
-			}
-		}
-		return null;
 	}
 	
 	private function sendErrorMessage(int $statusCode, string $error, string $page): void
