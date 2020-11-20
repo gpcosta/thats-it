@@ -12,6 +12,7 @@ use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
 use ThatsIt\Configurations\Configurations;
+use ThatsIt\Exception\ClientException;
 use ThatsIt\Request\Exception\MissingRequestMetaVariableException;
 use ThatsIt\Sanitizer\Sanitizer;
 
