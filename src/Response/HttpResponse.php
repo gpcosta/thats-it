@@ -56,6 +56,11 @@ abstract class HttpResponse
      * @var string
      */
     protected $environment = AbstractController::ENVIRONMENT_PROD;
+	
+	/**
+	 * @var string
+	 */
+    protected $currentUrl = '';
     
     /**
      * @var int - constant from Sanitizer
@@ -316,6 +321,22 @@ abstract class HttpResponse
     {
         return $this->environment;
     }
+	
+	/**
+	 * @param string $currentUrl
+	 */
+	public function setCurrentUrl(string $currentUrl): void
+	{
+		$this->currentUrl = $currentUrl;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getCurrentUrl(): string
+	{
+		return $this->currentUrl;
+	}
     
     /**
      * @param Translator $translator
