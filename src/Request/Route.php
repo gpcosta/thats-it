@@ -130,6 +130,14 @@ class Route
 	}
 	
 	/**
+	 * @return int
+	 */
+	public function getSanitizer(): int
+	{
+		return $this->sanitizer;
+	}
+	
+	/**
 	 * @return array
 	 */
 	public function getAllRoute(): array
