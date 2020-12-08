@@ -9,6 +9,7 @@
 namespace ThatsIt\Request;
 
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\Sanitizer\Sanitizer;
 
 /**
  * Class Route
@@ -47,6 +48,16 @@ class Route
 	private $parameters;
 	
 	/**
+	 * @var int
+	 */
+	private $sanitizer;
+	
+	/**
+	 * @var array
+	 */
+	private $allRoute;
+	
+	/**
 	 * Route constructor.
 	 * @param string $routeName
 	 * @param array $routeArray
@@ -54,10 +65,10 @@ class Route
 	 */
 	public function __construct(string $routeName, array $routeArray)
 	{
-		if (isset($routeArray['path'], $routeArray['httpMethods'], $routeArray['controller'], $routeArray['function'],
-				$route['parameters'])) {
+		if (!isset($routeArray['path'], $routeArray['httpMethods'], $routeArray['controller'], $routeArray['function'],
+				$routeArray['parameters'])) {
 			throw new PlatformException('Route '.$routeName.' is incomplete. '.
-				'It must have path, httpMethods, controller, function and parameters.');
+				'It must have path, httpMethods, controller, function and parameters.', 404);
 		}
 		
 		$this->name = $routeName;
@@ -66,6 +77,8 @@ class Route
 		$this->controller = $routeArray['controller'];
 		$this->function = $routeArray['function'];
 		$this->parameters = $routeArray['parameters'];
+		$this->sanitizer = isset($routeArray['sanitizer']) ? $routeArray['sanitizer'] : Sanitizer::SANITIZER_NONE;
+		$this->allRoute = $routeArray;
 	}
 	
 	/**
@@ -114,5 +127,25 @@ class Route
 	public function getParameters(): array
 	{
 		return $this->parameters;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getAllRoute(): array
+	{
+		return $this->allRoute;
+	}
+	
+	/**
+	 * @param string $fieldName
+	 * @param null $defaultValue - in case of this field doens't exist, it will return the default value
+	 * @return mixed|null
+	 */
+	public function getAllRouteField(string $fieldName, $defaultValue = null)
+	{
+		if (array_key_exists($fieldName, $this->allRoute))
+			return $this->allRoute[$fieldName];
+		return $defaultValue;
 	}
 }

@@ -27,7 +27,7 @@ use ThatsIt\Sanitizer\Sanitizer;
 class HttpRequest
 {
 	/**
-	 * @var array
+	 * @var Route
 	 */
 	protected $currentRoute;
 	
