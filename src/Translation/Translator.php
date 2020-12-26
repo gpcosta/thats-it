@@ -88,16 +88,25 @@ class Translator
     /**
      * Translate token for the respective language.
      * If there is no translation possible, token is returned
+	 *
+	 * Translations can have variables (ex: {var1}, with brackets {})
+	 * If you pass $variables, this variables will be replaced
      *
      * @param string $token
+     * @param array $variables - key: placeholder of the variable
+	 * 							  value: value to replace the placeholder with
      * @return string
      */
-    public function translate(string $token): string
+    public function translate(string $token, array $variables = []): string
     {
         $lowerToken = strtolower($token);
         if (!is_array($this->translationFile) || !array_key_exists($lowerToken, $this->translationFile))
             return $token;
-        return $this->translationFile[$lowerToken];
+        
+        $translatedText = $this->translationFile[$lowerToken];
+        foreach ($variables as $placeholder => $value)
+        	$translatedText = str_replace('{'.$placeholder.'}', $value, $translatedText);
+        return $translatedText;
     }
     
     /**

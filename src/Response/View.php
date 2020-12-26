@@ -62,9 +62,9 @@ class View extends HttpResponse
         // if there is a page to show, it will show it
         if ($this->pageToShow) {
             extract($this->variables);
-            $t = function(string $token) {
+            $t = function(string $token, array $variables = []) {
                 if ($this->translator)
-                    return $this->translator->translate($token);
+                    return $this->translator->translate($token, $variables);
                 else
                     return $token;
             };
