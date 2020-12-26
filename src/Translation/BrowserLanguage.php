@@ -103,24 +103,47 @@ class BrowserLanguage
     /**
      * Will get the most appropriate language (ISO 639-1) from the available ones
      *
-     * @param array $availableLanguages
+     * @param array $availableLanguages - if is passed an empty array, the language with
+	 * 									   the most suitable factor is returned (bigger q factor)
      * @return null|string
      */
-    public function getMostAppropriateISOLanguage(array $availableLanguages): ?string
+    public function getMostAppropriateISOLanguage(array $availableLanguages = []): ?string
     {
         $lang = $this->getMostAppropriateFullLanguage($availableLanguages);
-        return ($lang ? substr($lang, 0, 2) : null);
+        return ($lang ? strtolower(substr($lang, 0, 2)) : null);
     }
+	
+	/**
+	 * @param array $availableLanguages - if is passed an empty array, the country of the language with
+	 * 									   the most suitable factor is returned (bigger q factor)
+	 * @return null|string
+	 */
+    public function getMostAppropriateISOCountryBasedOnLanguage(array $availableLanguages = []): ?string
+	{
+		$lang = $this->getMostAppropriateFullLanguage($availableLanguages);
+		if ($lang === null)
+			return null;
+		
+		$parts = explode('-', $lang);
+		return strtolower(array_key_exists(1, $parts) ? $parts[1] : $parts[0]);
+	}
     
     /**
      * Will get the most appropriate language (full code) from the available ones
      *
-     * @param array $availableLanguages
+     * @param array $availableLanguages - if is passed an empty array, the language with
+	 * 									   the most suitable factor is returned (bigger q factor)
      * @return null|string
      */
-    public function getMostAppropriateFullLanguage(array $availableLanguages): ?string
+    public function getMostAppropriateFullLanguage(array $availableLanguages = []): ?string
     {
+    	$thereIsAvailableLanguages = (bool) count($availableLanguages);
+    	
         foreach ($this->languages as $lang => $val) {
+        	// if none language is been passed as $availableLanguages, the one with biggest "q" factor is returned
+        	if (!$thereIsAvailableLanguages)
+        		return $lang;
+        	
             foreach ($availableLanguages as $availableLanguage) {
                 if (strpos($lang, $availableLanguage) === 0)
                     return $lang;
