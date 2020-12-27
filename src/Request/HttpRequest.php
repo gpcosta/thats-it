@@ -98,7 +98,10 @@ class HttpRequest
 	private function getChosenRouteAndVars(array $routes): array
 	{
 		$toReturn = ['route' => null, 'vars' => array()];
-		$routeInfo = $this->getDispatcher($routes)->dispatch($this->getMethod(), $this->getPath());
+		$path = $this->getPath();
+		if (mb_substr($path, -1) == '/')
+			$path = mb_substr($path, 0, -1);
+		$routeInfo = $this->getDispatcher($routes)->dispatch($this->getMethod(), $path);
 		switch ($routeInfo[0]) {
 			case Dispatcher::NOT_FOUND:
 				throw new ClientException("Not found what was requested.", 404);
