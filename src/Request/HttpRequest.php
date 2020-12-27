@@ -99,7 +99,7 @@ class HttpRequest
 	{
 		$toReturn = ['route' => null, 'vars' => array()];
 		$path = $this->getPath();
-		if (mb_substr($path, -1) == '/')
+		if ($path != '/' && mb_substr($path, -1) == '/')
 			$path = mb_substr($path, 0, -1);
 		$routeInfo = $this->getDispatcher($routes)->dispatch($this->getMethod(), $path);
 		switch ($routeInfo[0]) {
