@@ -35,14 +35,15 @@ class View extends HttpResponse
      */
     public function __construct($viewOrComponent)
     {
-        if ($viewOrComponent instanceof AppComponent) {
-            $this->component = $viewOrComponent;
-            $this->pageToShow = null;
-        } else if (is_string($viewOrComponent)) {
-            $this->pageToShow = $viewOrComponent;
-            $this->component = null;
-        }
-        $this->setSanitizer(Sanitizer::SANITIZER_HTML_ENCODE);
+		if ($viewOrComponent instanceof AppComponent) {
+			$this->component = $viewOrComponent;
+			$this->pageToShow = null;
+		} else if (is_string($viewOrComponent)) {
+			$this->pageToShow = $viewOrComponent;
+			$this->component = null;
+		}
+		$this->setSanitizer(Sanitizer::SANITIZER_HTML_ENCODE);
+		$this->setHeader('Content-Type', 'text/html;charset=utf-8');
     }
     
     /**
