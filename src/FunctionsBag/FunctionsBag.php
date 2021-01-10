@@ -83,10 +83,17 @@ class FunctionsBag
 				PlatformException::ERROR_NOT_FOUND_DANGER);
 		}
 		
+		$path = $routes[$name]['path'];
+		
+		if ($withOptional) {
+			// obtain all optional groups, even the ones inside other optinal groups
+			// ex: /{urlCode}[/{orderType}[/{menuId}[/{productId}]]]
+			$initialGroupOfOptionals = self::getGroupOfOptionalsInUrl($path);
+		}
+		
 		// save variables names that were already used in url
 		$alreadyUsedVariablesInPath = [];
 		
-		$path = $routes[$name]['path'];
 		// will substitute all variables for their value
 		foreach ($variables as $name => $value) {
 			// arrays are only used as GET (or query) parameters
@@ -104,7 +111,20 @@ class FunctionsBag
 		foreach ($alreadyUsedVariablesInPath as $variableName) unset($variables[$variableName]);
 		
 		if ($withOptional) {
-			// if so removes just brackets
+			$finalGroupOfOptionals = self::getGroupOfOptionalsInUrl($path);
+			$biggestEqualGroup = -1;
+			for ($i = count($finalGroupOfOptionals) - 1; $i >= 0; $i--) {
+				if ($initialGroupOfOptionals[$i] == $finalGroupOfOptionals[$i])
+					$biggestEqualGroup = $i;
+			}
+			
+			if ($biggestEqualGroup != -1) {
+				// remove groups of optionals that
+				$path =
+					preg_replace("/".preg_quote("[".
+							$finalGroupOfOptionals[$biggestEqualGroup]
+						."]", "/")."/", "", $path);
+			}
 			$path = preg_replace("/\[|\]/", "", $path);
 		} else {
 			// else removes everything that is inside of brackets
@@ -127,6 +147,30 @@ class FunctionsBag
 		if ($addDomain) $path = Configurations::getDomain() . $path;
 		
 		return $path;
+	}
+	
+	/**
+	 * @param string $url
+	 * @return string[] - array with all group of optionals order by the biggest to the smallest
+	 * 					   - first is the main one, the others are all inside of the previous
+	 */
+	private static function getGroupOfOptionalsInUrl(string $url): array
+	{
+		if (preg_match("/\[(.*)\]/", $url, $matches)) {
+			$groupOfOptionals = self::getGroupOfOptionalsInUrl($matches[1]);
+			if ($groupOfOptionals === [])
+				return [$matches[1]];
+			else {
+				return array_merge([$matches[1]], $groupOfOptionals);
+			}
+		} else {
+			return [];
+		}
+		
+		// /{urlCode}[/{orderType}[/{menuId}[/{productId}]]]
+		// /{orderType}[/{menuId}[/{productId}]]
+		// /{menuId}[/{productId}]
+		// /{productId}
 	}
 	
 	/**
