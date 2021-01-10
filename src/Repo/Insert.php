@@ -6,7 +6,7 @@
  * Time: 22:27
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 /**
  * Class Insert

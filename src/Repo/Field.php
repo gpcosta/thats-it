@@ -6,7 +6,7 @@
  * Time: 20:32
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 /**
  * Class Field

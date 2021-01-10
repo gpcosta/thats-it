@@ -6,9 +6,10 @@
  * Time: 19:53
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 use PDO;
+use ThatsIt\Exception\PlatformException;
 
 /**
  * Class Select
@@ -86,5 +87,44 @@ class Select extends AbstractQuery
 		}
 		$this->query = substr($this->query, 0, -2);
 		return $this;
+	}
+	
+	/**
+	 * @return mixed
+	 */
+	public function getNextRow()
+	{
+		return $this->stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	
+	/**
+	 * @param string $objectClass
+	 * @return Object with $objectClass as class
+	 * @throws PlatformException
+	 */
+	public function getNextObject(string $objectClass)
+	{
+		if (!array_key_exists(AbstractObject::class, class_parents($objectClass)))
+			throw new PlatformException(
+				'Invalid objectClass because objectClass must extend '.AbstractObject::class, 500
+			);
+		
+		$row = $this->getNextRow();
+		if ($row === null)
+			return null;
+		return $objectClass::getInstanceBasedInRow($this->pdo, $row);
+	}
+	
+	/**
+	 * @param string $objectClass
+	 * @return Object[] with $objectClass as class
+	 * @throws PlatformException
+	 */
+	public function getAllObjects(string $objectClass): array
+	{
+		$result = [];
+		while ($object = $this->getNextObject($objectClass))
+			$result[] = $object;
+		return $result;
 	}
 }

@@ -6,13 +6,14 @@
  * Time: 23:09
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 use PDO;
+use ThatsIt\Exception\PlatformException;
 
 /**
  * Class AbstractObject
- * @package Servido\Repo
+ * @package ThatsIt\Repo
  */
 abstract class AbstractObject
 {
@@ -36,11 +37,11 @@ abstract class AbstractObject
 	}
 	
 	protected static function getObjectField(string $field, string $tableName = '', string $function = '',
-											 string $alias = ''): Field
+											  string $alias = ''): Field
 	{
 		$fieldsInDB = self::getObjectFieldsNamesInDB();
 		if (!in_array($field, $fieldsInDB))
-			throw new \Exception()
+			throw new PlatformException('There is no such field.', 500);
 		return new Field($fieldsInDB[$field], $tableName, $function, $alias);
 	}
 	

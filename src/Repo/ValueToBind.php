@@ -6,7 +6,7 @@
  * Time: 22:38
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 use PDO;
 

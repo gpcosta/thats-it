@@ -6,7 +6,7 @@
  * Time: 23:36
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 /**
  * Class Cache

@@ -6,7 +6,7 @@
  * Time: 19:57
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 /**
  * Class Condition

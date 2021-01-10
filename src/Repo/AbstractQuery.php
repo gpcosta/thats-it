@@ -6,7 +6,7 @@
  * Time: 19:37
  */
 
-namespace Servido\Repo;
+namespace ThatsIt\Repo;
 
 use PDO;
 use PDOStatement;
@@ -20,12 +20,12 @@ abstract class AbstractQuery
 	/**
 	 * @var PDO
 	 */
-	private $pdo;
+	protected $pdo;
 	
 	/**
 	 * @var PDOStatement
 	 */
-	private $stmt;
+	protected $stmt;
 	
 	/**
 	 * @var string
@@ -65,26 +65,5 @@ abstract class AbstractQuery
 		foreach ($this->values as $value)
 			$this->stmt->bindValue($value->getName(), $value->getValue(), $value->getPdoTypeParam());
 		return $this->stmt->execute();
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function getNextRow(): array
-	{
-		return $this->stmt->fetch(PDO::FETCH_ASSOC);
-	}
-	
-	/**
-	 * @param string $objectClass
-	 * @return Object with $objectClass as class
-	 * @throws \Exception
-	 */
-	public function getNextObject(string $objectClass)
-	{
-		if (!array_key_exists(AbstractObject::class, class_parents($objectClass)))
-			throw new \Exception('Invalid objectClass because objectClass must extend '.AbstractObject::class);
-		
-		return $objectClass::getInstanceBasedInRow($this->pdo, $this->getNextRow());
 	}
 }
