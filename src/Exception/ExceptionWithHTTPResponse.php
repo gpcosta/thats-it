@@ -66,7 +66,7 @@ class ExceptionWithHTTPResponse extends \Exception
 	 * @param mixed|null $context - send anything that is printable to put in log
 	 */
 	public function __construct(HttpRequest $request, HttpResponse $response, int $code, int $loggerLevel,
-								string $message, Throwable $previous = null, $context = null)
+								string $message = '', Throwable $previous = null, $context = null)
 	{
 		parent::__construct($message, $code, $previous);
 		
