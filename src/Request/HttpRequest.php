@@ -467,7 +467,7 @@ class HttpRequest
 	 * @return mixed
 	 * @throws MissingRequestMetaVariableException
 	 */
-	private function getServerVariable($key)
+	public function getServerVariable($key)
 	{
 		if (!array_key_exists($key, $this->server)) {
 			throw new MissingRequestMetaVariableException($key);
