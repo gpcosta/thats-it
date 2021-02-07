@@ -77,13 +77,7 @@ class VerifySrcFolderState extends StateCommand
      */
     private function verifyPublicFolder(): void
     {
-        $generalConfig = Configurations::getGeneralConfig();
-        if (!isset($generalConfig['locationServer'])) {
-            throw new \Exception(
-                "You need to indicate the location of the server in config/config.php (field locationServer).");
-        }
-        $folder = $generalConfig['locationServer'];
-        
+        $folder = Configurations::getLocationServer();
         if (!is_dir($folder) && !mkdir($folder, 0777, true)) {
             throw new \Exception("It was not possible to create ".$folder." folder." . PHP_EOL);
         } else {

@@ -4,6 +4,7 @@ namespace ThatsIt\Controller;
 
 use Monolog\Logger;
 use \PDO;
+use ThatsIt\Configurations\Configurations;
 use ThatsIt\Database\Database;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Request\HttpRequest;
@@ -15,9 +16,6 @@ use ThatsIt\Security\CSRFToken;
  */
 abstract class AbstractController
 {
-	const ENVIRONMENT_DEV = "development";
-	const ENVIRONMENT_PROD = "production";
-	
 	/**
 	 * @var Database
 	 */
@@ -53,10 +51,10 @@ abstract class AbstractController
 	public function __construct(string $environment, HttpRequest $request, Logger $logger)
 	{
 		$this->db = new Database();
-		if (in_array($environment, [self::ENVIRONMENT_DEV, self::ENVIRONMENT_PROD])) {
+		if (in_array($environment, [Configurations::ENVIRONMENT_DEV, Configurations::ENVIRONMENT_PROD])) {
 			$this->environment = $environment;
 		} else {
-			$this->environment = self::ENVIRONMENT_PROD;
+			$this->environment = Configurations::ENVIRONMENT_PROD;
 		}
 		$this->request = $request;
 		$this->logger = $logger;

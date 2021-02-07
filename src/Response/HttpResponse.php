@@ -8,7 +8,7 @@
 
 namespace ThatsIt\Response;
 
-use ThatsIt\Controller\AbstractController;
+use ThatsIt\Configurations\Configurations;
 use ThatsIt\Sanitizer\Sanitizer;
 use ThatsIt\Translation\Translator;
 
@@ -55,7 +55,7 @@ abstract class HttpResponse
     /**
      * @var string
      */
-    protected $environment = AbstractController::ENVIRONMENT_PROD;
+    protected $environment = Configurations::ENVIRONMENT_PROD;
 	
 	/**
 	 * @var string
@@ -308,8 +308,8 @@ abstract class HttpResponse
     public function setEnvironment(string $environment): void
     {
         if (
-            $environment === AbstractController::ENVIRONMENT_PROD ||
-            $environment === AbstractController::ENVIRONMENT_DEV
+            $environment === Configurations::ENVIRONMENT_PROD ||
+            $environment === Configurations::ENVIRONMENT_DEV
         )
             $this->environment = $environment;
     }
