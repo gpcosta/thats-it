@@ -173,6 +173,7 @@ class CurlRequest
 	
 	/**
 	 * @param string $postFields
+	 * @return CurlRequest
 	 */
 	public function setPostFields(string $postFields): self
 	{
@@ -183,6 +184,7 @@ class CurlRequest
 	/**
 	 * @param string $key
 	 * @param $value
+	 * @return CurlRequest
 	 */
 	public function addPostField(string $key, $value): self
 	{
@@ -441,7 +443,6 @@ class CurlRequest
 				"There was an error in CURL request. Error: ".$error,
 				PlatformException::ERROR_CURL_REQUEST
 			);
-		var_dump($response); die;
 		return $response;
     }
 }
