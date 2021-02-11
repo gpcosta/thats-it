@@ -85,10 +85,11 @@ class Sanitizer
 			case self::SANITIZER_NONE:
 				return $value;
 			case self::SANITIZER_UTF8_ENCODE:
-				$sanitizedValue = utf8_encode($value);
-				return $sanitizedValue;
+				if (mb_detect_encoding($value, 'UTF-8') == 'UTF-8')
+					return $value;
+				else
+					return utf8_encode($value);
 			case Sanitizer::SANITIZER_HTML_ENCODE:
-				$value = utf8_encode($value);
 				$sanitizedValue = htmlspecialchars(trim($value), ENT_QUOTES|ENT_HTML5, 'UTF-8');
 				// remove weird spaces
 				return preg_replace('/[\r\n\t\f\v]/', ' ', $sanitizedValue);
