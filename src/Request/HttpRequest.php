@@ -107,11 +107,11 @@ class HttpRequest
 		
 		$this->pathParameters = $this->getSanitizedParameters($routeAndVars['vars'], $this->currentRoute);
 		$this->queryParameters = $this->getSanitizedParameters($get, $this->currentRoute);
-		if ($this->getServerVariable('CONTENT_TYPE') == 'application/json')
+		if ($this->getServerVariable('CONTENT_TYPE', '') == 'application/json' ||
+				$this->getServerVariable('HTTP_CONTENT_TYPE', '') == 'application/json')
 			$this->bodyParameters = $this->getSanitizedParameters(json_decode($inputStream), $this->currentRoute);
 		else
 			$this->bodyParameters = $this->getSanitizedParameters($post, $this->currentRoute);
-		
 	}
 	
 	/**
@@ -507,13 +507,18 @@ class HttpRequest
 	
 	/**
 	 * @param $key
+	 * @param $defaultValue - if null, a MissingRequestMetaVariableException is raised
+	 * 						   if not found such server variable
 	 * @return mixed
 	 * @throws MissingRequestMetaVariableException
 	 */
-	public function getServerVariable($key)
+	public function getServerVariable($key, $defaultValue = null)
 	{
 		if (!array_key_exists($key, $this->server)) {
-			throw new MissingRequestMetaVariableException($key);
+			if ($defaultValue !== null)
+				return $defaultValue;
+			else
+				throw new MissingRequestMetaVariableException($key);
 		}
 		return $this->server[$key];
 	}
