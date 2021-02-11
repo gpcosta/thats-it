@@ -130,6 +130,18 @@ class Route
 	}
 	
 	/**
+	 * @param string $name
+	 * @param null $defaultValue
+	 * @return mixed|null
+	 */
+	public function getParameter(string $name, $defaultValue = null)
+	{
+		if (!isset($this->parameters[$name]))
+			return $defaultValue;
+		return $this->parameters[$name];
+	}
+	
+	/**
 	 * @return int
 	 */
 	public function getSanitizer(): int

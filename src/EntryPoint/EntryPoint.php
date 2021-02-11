@@ -100,7 +100,7 @@ class EntryPoint
 			if ($e->getLoggerLevel() !== ExceptionWithHTTPResponse::LOGGER_LEVEL_NO_LOG) {
 				$this->logger->addRecord($e->getLoggerLevel(), $e->getMessage(), [
 					'uri' => $e->getRequest()->getUri(),
-					'parameters' => $e->getRequest()->getParameters(),
+					'parameters' => $e->getRequest()->getAllParameters(),
 					'cookies' => $e->getRequest()->getCookies(),
 					'code' => $e->getCode(),
 					'trace' => $e->getTraceAsString(),

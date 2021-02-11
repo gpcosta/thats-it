@@ -8,6 +8,8 @@
 
 namespace ThatsIt\Sanitizer;
 
+use ForceUTF8\Encoding;
+
 /**
  * Class Sanitizer
  * @package ThatsIt\Sanitizer
@@ -52,6 +54,7 @@ class Sanitizer
     const SANITIZER_ALLOW_HTML = 4;
     
     /**
+	 * @param $variable
      * @param int $sanitizer - constant from above
      * @return mixed
      */
@@ -85,14 +88,10 @@ class Sanitizer
 			case self::SANITIZER_NONE:
 				return $value;
 			case self::SANITIZER_UTF8_ENCODE:
-				if (mb_detect_encoding($value, 'UTF-8') == 'UTF-8')
-					return $value;
-				else
-					return utf8_encode($value);
+				return Encoding::fixUTF8($value, Encoding::ICONV_TRANSLIT);
 			case Sanitizer::SANITIZER_HTML_ENCODE:
-				$sanitizedValue = htmlspecialchars(trim($value), ENT_QUOTES|ENT_HTML5, 'UTF-8');
-				// remove weird spaces
-				return preg_replace('/[\r\n\t\f\v]/', ' ', $sanitizedValue);
+				$value = self::getSanitizedValue($value, self::SANITIZER_UTF8_ENCODE);
+				return htmlspecialchars(trim($value), ENT_QUOTES|ENT_HTML5, 'UTF-8');
 			case self::SANITIZER_ALLOW_HTML:
 				$config = \HTMLPurifier_Config::createDefault();
 				$purifier = new \HTMLPurifier($config);

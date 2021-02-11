@@ -88,7 +88,7 @@ class ValidateController
 		$this->methodName = $request->getCurrentRoute()->getFunction();
 		$this->reflectionMethod = $this->reflectionController->getMethod($this->methodName);
 		$this->routeParameters = $request->getCurrentRoute()->getParameters();
-		$this->givenParameters = $request->getParameters();
+		$this->givenParameters = $request->getAllParameters();
 		$this->correctParameters = $this->getCorrectParameters();
 	}
 	

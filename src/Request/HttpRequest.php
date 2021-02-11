@@ -32,14 +32,24 @@ class HttpRequest
 	protected $currentRoute;
 	
 	/**
-	 * @var array
+	 * @var string
 	 */
-	protected $getParameters;
+	protected $method;
 	
 	/**
 	 * @var array
 	 */
-	protected $postParameters;
+	protected $pathParameters;
+	
+	/**
+	 * @var array
+	 */
+	protected $queryParameters;
+	
+	/**
+	 * @var array
+	 */
+	protected $bodyParameters;
 	
 	/**
 	 * @var array
@@ -69,12 +79,12 @@ class HttpRequest
 	 * @param array $files
 	 * @param array $server
 	 * @param string $inputStream
+	 * @throws MissingRequestMetaVariableException
+	 * @throws \ThatsIt\Exception\PlatformException
 	 */
 	public function __construct(array $get, array $post, array $cookies, array $files, array $server,
 								 string $inputStream = '')
 	{
-		$this->getParameters = $this->getSanitizedParameters($get);
-		$this->postParameters = $this->getSanitizedParameters($post);
 		$this->cookies = $cookies;
 		$this->files = [];
 		foreach ($files as $key => $file) {
@@ -85,9 +95,23 @@ class HttpRequest
 		$this->server = $server;
 		$this->inputStream = $inputStream;
 		
+		// define current method
+		$this->method = $this->getServerVariable('REQUEST_METHOD');
+		if (isset($get['_method']))
+			$this->method = $get['_method'];
+		if (isset($post['_method']))
+			$this->method = $post['_method'];
+		
 		$routeAndVars = $this->getChosenRouteAndVars(Configurations::getRoutesConfig());
 		$this->currentRoute = $routeAndVars['route'];
-		$this->getParameters = array_merge($this->getParameters, $routeAndVars['vars']);
+		
+		$this->pathParameters = $this->getSanitizedParameters($routeAndVars['vars'], $this->currentRoute);
+		$this->queryParameters = $this->getSanitizedParameters($get, $this->currentRoute);
+		if ($this->getServerVariable('CONTENT_TYPE') == 'application/json')
+			$this->bodyParameters = $this->getSanitizedParameters(json_decode($inputStream), $this->currentRoute);
+		else
+			$this->bodyParameters = $this->getSanitizedParameters($post, $this->currentRoute);
+		
 	}
 	
 	/**
@@ -101,7 +125,7 @@ class HttpRequest
 		$path = $this->getPath();
 		if ($path != '/' && mb_substr($path, -1) == '/')
 			$path = mb_substr($path, 0, -1);
-		$routeInfo = $this->getDispatcher($routes)->dispatch($this->getMethod(), $path);
+		$routeInfo = $this->getDispatcher($routes)->dispatch($this->method, $path);
 		switch ($routeInfo[0]) {
 			case Dispatcher::NOT_FOUND:
 				throw new ClientException("Not found what was requested.", 404);
@@ -139,14 +163,16 @@ class HttpRequest
 	 * methods provided by $currentRouteParameters
 	 *
 	 * @param array $givenParameters
-	 * @param array $currentRouteParameters
+	 * @param Route $currentRoute
 	 * @return array
 	 */
-	private function getSanitizedParameters(array $givenParameters): array
+	private function getSanitizedParameters(array $givenParameters, Route $currentRoute): array
 	{
 		foreach ($givenParameters as $parameterName => $parameterValue) {
-			$sanitizer = (isset($currentRouteParameters[$parameterName]['sanitizer']) ?
-				$currentRouteParameters[$parameterName]['sanitizer'] : Sanitizer::SANITIZER_NONE
+			$parameter = $currentRoute->getParameter($parameterName);
+			$sanitizer = (is_array($parameter) && isset($parameter['sanitizer']) ?
+				$parameter['sanitizer'] :
+				Sanitizer::SANITIZER_HTML_ENCODE
 			);
 			$givenParameters[$parameterName] = Sanitizer::sanitize($parameterValue, $sanitizer);
 		}
@@ -162,6 +188,16 @@ class HttpRequest
 	}
 	
 	/**
+	 * Returns all parameters.
+	 *
+	 * @return array
+	 */
+	public function getAllParameters(): array
+	{
+		return array_merge($this->pathParameters, $this->queryParameters, $this->bodyParameters, $this->files);
+	}
+	
+	/**
 	 * Returns a parameter value or a default value if none is set.
 	 *
 	 * @param $key
@@ -170,13 +206,49 @@ class HttpRequest
 	 */
 	public function getParameter($key, $defaultValue = null)
 	{
-		if (array_key_exists($key, $this->postParameters)) {
-			return $this->postParameters[$key];
-		}
-		if (array_key_exists($key, $this->getParameters)) {
-			return $this->getParameters[$key];
-		}
+		if (array_key_exists($key, $this->bodyParameters))
+			return $this->bodyParameters[$key];
+		if (array_key_exists($key, $this->queryParameters))
+			return $this->queryParameters[$key];
+		if (array_key_exists($key, $this->pathParameters))
+			return $this->pathParameters[$key];
+		if (array_key_exists($key, $this->files))
+			return $this->files[$key];
 		return $defaultValue;
+	}
+	
+	/**
+	 * Returns all path parameters (params in path - before ?).
+	 *
+	 * @return array
+	 */
+	public function getPathParameters(): array
+	{
+		return $this->pathParameters;
+	}
+	
+	/**
+	 * Returns a path parameter value or a default value if none is set.
+	 *
+	 * @param $key
+	 * @param null $defaultValue
+	 * @return mixed|null
+	 */
+	public function getPathParameter($key, $defaultValue = null)
+	{
+		if (array_key_exists($key, $this->pathParameters))
+			return $this->pathParameters[$key];
+		return $defaultValue;
+	}
+	
+	/**
+	 * Returns all query parameters (params after ?).
+	 *
+	 * @return array
+	 */
+	public function getQueryParameters(): array
+	{
+		return $this->queryParameters;
 	}
 	
 	/**
@@ -188,10 +260,19 @@ class HttpRequest
 	 */
 	public function getQueryParameter($key, $defaultValue = null)
 	{
-		if (array_key_exists($key, $this->getParameters)) {
-			return $this->getParameters[$key];
-		}
+		if (array_key_exists($key, $this->queryParameters))
+			return $this->queryParameters[$key];
 		return $defaultValue;
+	}
+	
+	/**
+	 * Returns all body (post or json) parameters.
+	 *
+	 * @return array
+	 */
+	public function getBodyParameters(): array
+	{
+		return $this->bodyParameters;
 	}
 	
 	/**
@@ -203,10 +284,19 @@ class HttpRequest
 	 */
 	public function getBodyParameter($key, $defaultValue = null)
 	{
-		if (array_key_exists($key, $this->postParameters)) {
-			return $this->postParameters[$key];
-		}
+		if (array_key_exists($key, $this->bodyParameters))
+			return $this->bodyParameters[$key];
 		return $defaultValue;
+	}
+	
+	/**
+	 * Returns a File Iterator.
+	 *
+	 * @return array
+	 */
+	public function getFiles(): array
+	{
+		return $this->files;
 	}
 	
 	/**
@@ -240,6 +330,16 @@ class HttpRequest
 	}
 	
 	/**
+	 * Returns a Cookie Iterator.
+	 *
+	 * @return array
+	 */
+	public function getCookies(): array
+	{
+		return $this->cookies;
+	}
+	
+	/**
 	 * Returns a cookie value or a default value if none is set.
 	 *
 	 * @param $key
@@ -255,38 +355,6 @@ class HttpRequest
 	}
 	
 	/**
-	 * Returns all parameters.
-	 *
-	 * @return array
-	 */
-	public function getParameters(): array
-	{
-		return array_merge(
-			$this->getParameters, $this->postParameters, $this->files
-		);
-	}
-	
-	/**
-	 * Returns all query (get) parameters.
-	 *
-	 * @return array
-	 */
-	public function getQueryParameters(): array
-	{
-		return $this->getParameters;
-	}
-	
-	/**
-	 * Returns all body (post) parameters.
-	 *
-	 * @return array
-	 */
-	public function getBodyParameters(): array
-	{
-		return $this->postParameters;
-	}
-	
-	/**
 	 * Returns raw values from the read-only stream that allows you to read raw data from the request body.
 	 *
 	 * @return string
@@ -294,26 +362,6 @@ class HttpRequest
 	public function getRawBody(): string
 	{
 		return $this->inputStream;
-	}
-	
-	/**
-	 * Returns a Cookie Iterator.
-	 *
-	 * @return array
-	 */
-	public function getCookies(): array
-	{
-		return $this->cookies;
-	}
-	
-	/**
-	 * Returns a File Iterator.
-	 *
-	 * @return array
-	 */
-	public function getFiles(): array
-	{
-		return $this->files;
 	}
 	
 	/**
@@ -343,15 +391,10 @@ class HttpRequest
 	 * i.e. 'GET', 'POST', 'PUT', 'DELETE'.
 	 *
 	 * @return string
-	 * @throws MissingRequestMetaVariableException
 	 */
 	public function getMethod(): string
 	{
-		$method = $this->getServerVariable('REQUEST_METHOD');
-		if ($this->getParameter("_method")) {
-			$method = strtoupper($this->getParameter("_method"));
-		}
-		return $method;
+		return $this->method;
 	}
 	
 	/**
