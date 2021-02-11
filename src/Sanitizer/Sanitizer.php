@@ -88,7 +88,7 @@ class Sanitizer
 			case self::SANITIZER_NONE:
 				return $value;
 			case self::SANITIZER_UTF8_ENCODE:
-				return Encoding::fixUTF8($value, Encoding::ICONV_TRANSLIT);
+				return Encoding::toUTF8($value);
 			case Sanitizer::SANITIZER_HTML_ENCODE:
 				$value = self::getSanitizedValue($value, self::SANITIZER_UTF8_ENCODE);
 				return htmlspecialchars(trim($value), ENT_QUOTES|ENT_HTML5, 'UTF-8');
