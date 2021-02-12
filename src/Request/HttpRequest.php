@@ -172,7 +172,7 @@ class HttpRequest
 			$parameter = $currentRoute->getParameter($parameterName);
 			$sanitizer = (is_array($parameter) && isset($parameter['sanitizer']) ?
 				$parameter['sanitizer'] :
-				Sanitizer::SANITIZER_UTF8_ENCODE
+				Sanitizer::SANITIZER_NONE
 			);
 			$givenParameters[$parameterName] = Sanitizer::sanitize($parameterValue, $sanitizer);
 		}
