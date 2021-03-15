@@ -181,14 +181,13 @@ class FunctionsBag
 	 * @param string $toTimezone
 	 * @param string $format
 	 * @return string
-	 * @throws \Exception
 	 */
 	public static function changeTimezoneDate(string $date, string $fromTimezone = "UTC", string $toTimezone = "UTC",
 											  string $format = 'Y-m-d H:i:s'): string
 	{
-		if ($date === null) throw new \Exception("Date cannot be null.");
 		$dateTime = new \DateTime($date, new \DateTimeZone($fromTimezone));
-		$dateTime->setTimezone(new \DateTimeZone($toTimezone));
+		if ($fromTimezone != $toTimezone)
+			$dateTime->setTimezone(new \DateTimeZone($toTimezone));
 		return $dateTime->format($format);
 	}
 	

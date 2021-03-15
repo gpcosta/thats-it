@@ -25,6 +25,15 @@ class BrowserLanguage
      *              value: q - suitability factor of this language
      */
     private $languages;
+	
+	/**
+	 * @var array - array sorted by q factor (importance for the browser)
+	 *              key: country code
+	 *              value: q - suitability factor of this language
+	 *
+	 * @note: countries in this array are based on languages from $request->getBrowserLanguage()
+	 */
+    private $countries;
     
     /**
      * BrowserLanguage constructor.
@@ -34,123 +43,79 @@ class BrowserLanguage
     public function __construct(HttpRequest $request)
     {
         $this->languages = [];
+        $this->countries = [];
         // break up string into pieces (languages and q factors)
         preg_match_all(
-            '/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
+            '/(([a-z]{1,8})(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
             $request->getBrowserLanguage(),
             $langParse
         );
-    
-        if (count($langParse[1])) {
-            // create a list like "en" => 0.8
-            $this->languages = array_combine($langParse[1], $langParse[4]);
-        
-            // set default to 1 for any without q factor
-            foreach ($this->languages as $lang => $val) {
-                if ($val === '') $this->languages[$lang] = 1;
-            }
-        
-            // sort list based on value
-            arsort($this->languages, SORT_NUMERIC);
-        }
-    }
-    
-    /**
-     * @return array
-     */
-    public function getAllBrowserLanguages(): array
-    {
-        // look through sorted list and use first one that matches our languages
-        $validLanguages = [];
-        foreach ($this->languages as $lang => $val)
-            $validLanguages[] = $lang;
-        return $validLanguages;
-    }
-    
-    /**
-     * @param int $importance - from 1 to infinite
-     *                          0 get most appropriate language for the browser
-     *                          and with larger $importance less appropriate is the language returned
-     * @return null|string - ISO 639-1 code for the respective language is returned
-     *                       when $importance is bigger than the size of all appropriate languages,
-     *                       it will be returned null
-     */
-    public function getISOLanguageByImportance(int $importance): ?string
-    {
-        $lang = $this->getFullLanguageByImportance($importance);
-        return ($lang ? substr($lang, 0, 2) : null);
-    }
-    
-    /**
-     * @param int $importance - from 1 to infinite
-     *                          0 get most appropriate language for the browser
-     *                          and with larger $importance less appropriate is the language returned
-     * @return null|string - full code for the respective language is returned
-     *                       when $importance is bigger than the size of all appropriate languages,
-     *                       it will be returned null
-     */
-    public function getFullLanguageByImportance(int $importance): ?string
-    {
-        $importance--;
-        $i = 0;
-        foreach ($this->languages as $lang => $val) {
-            if ($importance == $i)
-                return $lang;
-        }
-        return null;
-    }
-    
-    /**
-     * Will get the most appropriate language (ISO 639-1) from the available ones
-     *
-     * @param array $availableLanguages - if is passed an empty array, the language with
-	 * 									   the most suitable factor is returned (bigger q factor)
-     * @return null|string
-     */
-    public function getMostAppropriateISOLanguage(array $availableLanguages = []): ?string
-    {
-        $lang = $this->getMostAppropriateFullLanguage($availableLanguages);
-        return ($lang ? strtolower(substr($lang, 0, 2)) : null);
+	
+		// $langParse[0] - each element is like 'pt;q=0.9' or 'pt-BR;q=0.8' or 'pt-PT'
+		// $langParse[1] - each element is like 'pt' or 'pt-BR' or 'pt-PT'
+		// $langParse[2] - each element is like 'pt' or 'pt' or 'pt'
+		// $langParse[3] - each element is like '' or '-BR' or '-PT'
+		// $langParse[4] - each element is like ';q=0.9' or ';q=0.8' or ''
+		// $langParse[5] - each element is like '0.9' or '0.8' or ''
+		for ($i = 0, $len = count($langParse[0]); $i < $len; $i++) {
+			$value = (int)($langParse[5][$i] == '' ? 1 : $langParse[5][$i]);
+			$this->languages[strtolower($langParse[2][$i])] = $value;
+			$this->countries[($langParse[3][$i] ? substr($langParse[3][$i], 1) : $langParse[2][$i])] = $value;
+		}
+		// sort lists based on value
+		arsort($this->languages, SORT_NUMERIC);
+		arsort($this->countries, SORT_NUMERIC);
     }
 	
 	/**
-	 * @param array $availableLanguages - if is passed an empty array, the country of the language with
+	 * Will get the most appropriate language (ISO 639-1) from the available ones
+	 *
+	 * @param array $availableLanguages - if is passed an empty array, the language with
 	 * 									   the most suitable factor is returned (bigger q factor)
+	 * @param null|string $defaultValue
 	 * @return null|string
 	 */
-    public function getMostAppropriateISOCountryBasedOnLanguage(array $availableLanguages = []): ?string
-	{
-		$lang = $this->getMostAppropriateFullLanguage($availableLanguages);
-		if ($lang === null)
-			return null;
-		
-		$parts = explode('-', $lang);
-		return strtolower(array_key_exists(1, $parts) ? $parts[1] : $parts[0]);
-	}
-    
-    /**
-     * Will get the most appropriate language (full code) from the available ones
-     *
-     * @param array $availableLanguages - if is passed an empty array, the language with
-	 * 									   the most suitable factor is returned (bigger q factor)
-     * @return null|string
-     */
-    public function getMostAppropriateFullLanguage(array $availableLanguages = []): ?string
+    public function getMostAppropriateISOLanguage(array $availableLanguages = [], ?string $defaultValue = null): ?string
     {
-    	$thereIsAvailableLanguages = (bool) count($availableLanguages);
-    	
-        foreach ($this->languages as $lang => $val) {
-        	// if none language is been passed as $availableLanguages, the one with biggest "q" factor is returned
-        	if (!$thereIsAvailableLanguages)
-        		return $lang;
-        	
-            foreach ($availableLanguages as $availableLanguage) {
-                if (strpos($lang, $availableLanguage) === 0)
-                    return $lang;
-            }
-        }
-        return null;
+    	// passing languages ordered by "q" factor
+		return $this->getFirstAvailableFrom(array_keys($this->languages), $availableLanguages, $defaultValue);
     }
+	
+	/**
+	 * @param int $importance - from 1 to infinite
+	 *                          0 get most appropriate language for the browser
+	 *                          and with larger $importance less appropriate is the language returned
+	 * @return null|string - ISO 639-1 code for the respective language is returned
+	 *                       when $importance is bigger than the size of all appropriate languages,
+	 *                       it will be returned null
+	 */
+	public function getISOLanguageByImportance(int $importance): ?string
+	{
+		$importance--;
+		$i = 0;
+		foreach ($this->languages as $lang => $val) {
+			if ($importance == $i)
+				return $lang;
+		}
+		return null;
+	}
+	
+	/**
+	 * Will get the most appropriate country (ISO 639-1) from the available ones
+	 * @note: the country returned is based on languages from $request->getBrowserLanguage()
+	 * 		  it is not the most reliable method to get current country of the user
+	 *
+	 * @param array $availableCountries - if is passed an empty array, the country with
+	 * 									   the most suitable factor is returned (bigger q factor)
+	 * @param null|string $defaultValue
+	 * @return null|string
+	 */
+    public function getMostAppropriateISOCountryBasedOnLanguage(array $availableCountries = [],
+																 ?string $defaultValue = null): ?string
+	{
+		// passing countries ordered by "q" factor
+		return $this->getFirstAvailableFrom(array_keys($this->countries), $availableCountries, $defaultValue);
+	}
     
     /**
      * @param string $language
@@ -164,4 +129,31 @@ class BrowserLanguage
         }
         return false;
     }
+	
+	/**
+	 * Method to get first value from $fromValues array that are in $searchValues array
+	 * If no value is found, $defaultValue is returned
+	 *
+	 * @param array $fromValues
+	 * @param array $searchValues
+	 * @param null|string $defaultValue
+	 * @return null|string
+	 */
+    private function getFirstAvailableFrom(array $fromValues, array $searchValues,
+										    ?string $defaultValue = null): ?string
+	{
+		$thereIsSearchValues = (bool) count($searchValues);
+		
+		foreach ($fromValues as $val) {
+			// if $searchValues is empty array, the first value from $fromValues is returned
+			if (!$thereIsSearchValues)
+				return $val;
+			
+			foreach ($searchValues as $searchValue) {
+				if (strpos($val, $searchValue) === 0)
+					return $val;
+			}
+		}
+		return $defaultValue;
+	}
 }

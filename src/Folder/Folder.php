@@ -69,6 +69,22 @@ class Folder
      */
     public static function getTranslationsFolder(): string
     {
-        return self::getSourceFolder().'/translations';
+        return self::getSourceFolder().'/Translations';
     }
+	
+	/**
+	 * @return string
+	 */
+    public static function getControllerFolder(): string
+	{
+		return self::getSourceFolder().'/Controller';
+	}
+	
+	/**
+	 * @return string
+	 */
+    public static function getViewFolder(): string
+	{
+		return self::getSourceFolder().'/View';
+	}
 }

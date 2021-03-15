@@ -253,7 +253,7 @@ class Configurations
 			);
 		}
 		
-		$value = require_once $filepath;
+		$value = require($filepath);
 		foreach ($fields as $field) {
 			if (!array_key_exists($field, $value))
 				throw new PlatformException(
