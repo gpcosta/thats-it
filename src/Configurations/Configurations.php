@@ -105,19 +105,30 @@ class Configurations
 				PlatformException::ERROR_CONFIG_LINE_MISSING);
 		return $config['environment'];
 	}
-	
-	/**
-	 * @return string
-	 * @throws PlatformException
-	 */
-	public static function getDomain(): string
-	{
-		$config = self::getGeneralConfig();
-		if (!array_key_exists('domain', $config))
-			throw new PlatformException('There is no domain defined in config/config.php',
-				PlatformException::ERROR_CONFIG_LINE_MISSING);
-		return $config['domain'];
-	}
+    
+    /**
+     * @return string
+     * @throws PlatformException
+     */
+    public static function getDomain(): string
+    {
+        $config = self::getGeneralConfig();
+        if (!array_key_exists('domain', $config))
+            throw new PlatformException('There is no domain defined in config/config.php',
+                PlatformException::ERROR_CONFIG_LINE_MISSING);
+        return $config['domain'];
+    }
+    
+    /**
+     * @param bool $withHttp
+     * @param bool $isSecure
+     * @return string
+     * @throws PlatformException
+     */
+    public static function getHost(bool $withHttp = true, bool $isSecure = true): string
+    {
+        return ($withHttp ? 'http' . ($isSecure ? 's' : '') . '://' : '') . self::getDomain();
+    }
 	
     /**
      * Get configuration used by Twitter Snowflake ID
