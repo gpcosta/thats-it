@@ -438,12 +438,12 @@ class HttpRequest
 	 * The address of the page (if any) which referred the user agent to the
 	 * current page.
 	 *
-	 * @return string
+	 * @return string - if there is any referer, it is returned an empty string
 	 * @throws MissingRequestMetaVariableException
 	 */
 	public function getReferer(): string
 	{
-		return $this->getServerVariable('HTTP_REFERER');
+		return $this->getServerVariable('HTTP_REFERER', '');
 	}
 	
 	/**

@@ -92,6 +92,24 @@ class Configurations
 				PlatformException::ERROR_CONFIG_LINE_MISSING);
 		return $config['environment'];
 	}
+    
+    /**
+     * @return bool
+     * @throws PlatformException
+     */
+	public static function inProductionEnvironment(): bool
+    {
+        return self::getEnvironment() == Configurations::ENVIRONMENT_PROD;
+    }
+    
+    /**
+     * @return bool
+     * @throws PlatformException
+     */
+    public static function inDevelopmentEnvironment(): bool
+    {
+        return !self::inProductionEnvironment();
+    }
 	
 	/**
 	 * @return string
@@ -110,14 +128,14 @@ class Configurations
      * @return string
      * @throws PlatformException
      */
-    public static function getDomain(): string
-    {
-        $config = self::getGeneralConfig();
-        if (!array_key_exists('domain', $config))
-            throw new PlatformException('There is no domain defined in config/config.php',
-                PlatformException::ERROR_CONFIG_LINE_MISSING);
-        return $config['domain'];
-    }
+	public static function getDomain(): string
+	{
+		$config = self::getGeneralConfig();
+		if (!array_key_exists('domain', $config))
+			throw new PlatformException('There is no domain defined in config/config.php',
+				PlatformException::ERROR_CONFIG_LINE_MISSING);
+		return $config['domain'];
+	}
     
     /**
      * @param bool $withHttp
