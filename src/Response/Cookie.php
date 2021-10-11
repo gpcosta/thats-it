@@ -54,6 +54,11 @@ class Cookie
     private $httpOnly;
     
     /**
+     * @var string
+     */
+    private $sameSite;
+    
+    /**
      * Cookie constructor.
      * @param string $name
      * @param string $value
@@ -62,9 +67,10 @@ class Cookie
      * @param bool $secure
      * @param string $path
      * @param string $domain
+     * @param string $sameSite
      */
-    public function __construct(string $name, $value = "", int $maxAge = 0, bool $httpOnly = true,
-                                bool $secure = true, $path = "/", string $domain = "")
+    public function __construct(string $name, $value = '', int $maxAge = 0, bool $httpOnly = true,
+                                bool $secure = true, $path = '/', string $domain = '', string $sameSite = 'Lax')
     {
         $this->name = $name;
         $this->value = (string) $value;
@@ -73,6 +79,7 @@ class Cookie
         $this->secure = $secure;
         $this->httpOnly = $httpOnly;
         $this->domain = $domain;
+        $this->sameSite = $sameSite;
     }
     
     /**
@@ -147,6 +154,14 @@ class Cookie
     }
     
     /**
+     * @param string $sameSite
+     */
+    public function setSameSite(string $sameSite)
+    {
+        $this->sameSite = $sameSite;
+    }
+    
+    /**
      * Returns the cookie HTTP header string.
      *
      * @return string
@@ -161,7 +176,8 @@ class Cookie
             $this->getPathString(),
             $this->getSecureString(),
             $this->getHttpOnlyString(),
-            $this->getDomainString()
+            $this->getDomainString(),
+            $this->getSameSiteString()
         ];
     
         // in this case, there is no callback supplied,
@@ -213,6 +229,13 @@ class Cookie
     {
         if ($this->httpOnly) {
             return 'HttpOnly';
+        }
+    }
+    
+    private function getSameSiteString()
+    {
+        if ($this->httpOnly) {
+            return 'SameSite='.$this->sameSite;
         }
     }
 }
