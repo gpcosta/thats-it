@@ -66,6 +66,7 @@ class FunctionsBag
 	 * @param string $name
 	 * @param array $variables [name => value]
 	 * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
+     *                           - this parameter is deprecated and any value that is passed here is ignored
 	 * @param bool $addDomain (if true, will add the domain to the url)
 	 * @return string
 	 * @throws PlatformException
@@ -85,11 +86,11 @@ class FunctionsBag
 		
 		$path = $routes[$name]['path'];
 		
-		if ($withOptional) {
+		//if ($withOptional) {
 			// obtain all optional groups, even the ones inside other optinal groups
 			// ex: /{urlCode}[/{orderType}[/{menuId}[/{productId}]]]
 			$initialGroupOfOptionals = self::getGroupOfOptionalsInUrl($path);
-		}
+		//}
 		
 		// save variables names that were already used in url
 		$alreadyUsedVariablesInPath = [];
@@ -112,7 +113,7 @@ class FunctionsBag
 		// remove all variables already set in url (this step was not made in last foreach just as a safety measure)
 		foreach ($alreadyUsedVariablesInPath as $variableName) unset($variables[$variableName]);
 		
-		if ($withOptional) {
+		//if ($withOptional) {
 			$finalGroupOfOptionals = self::getGroupOfOptionalsInUrl($path);
 			$biggestEqualGroup = -1;
 			for ($i = count($finalGroupOfOptionals) - 1; $i >= 0; $i--) {
@@ -128,10 +129,10 @@ class FunctionsBag
 						."]", "/")."/", "", $path);
 			}
 			$path = preg_replace("/\[|\]/", "", $path);
-		} else {
+		/*} else {
 			// else removes everything that is inside of brackets
 			$path = preg_replace("/\[.*\]/", "", $path);
-		}
+		}*/
 		
 		// will add get variables (this variables are the remain ones from $variables that were not set in $path already)
 		// http_build_query construct a url based in $variables passed to it
