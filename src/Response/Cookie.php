@@ -234,7 +234,7 @@ class Cookie
     
     private function getSameSiteString()
     {
-        if ($this->httpOnly) {
+        if ($this->sameSite) {
             return 'SameSite='.$this->sameSite;
         }
     }
