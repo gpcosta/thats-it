@@ -37,11 +37,10 @@ class Translator
 	 * Translator constructor.
 	 * @param string $translationFilename
 	 * @param string $locale
-	 * @throws PlatformException
 	 */
 	public function __construct(string $translationFilename, string $locale)
 	{
-		$this->locale = $locale;
+		$this->locale = strtolower($locale);
 		$this->translationFilename = $translationFilename;
 		$this->translationFile = null;
 	}
@@ -87,19 +86,20 @@ class Translator
 		}
 		return $this;
 	}
-	
-	/**
-	 * Translate token for the respective language.
-	 * If there is no translation possible, token is returned
-	 *
-	 * Translations can have variables (ex: {{var1}}, with brackets {{}})
-	 * If you pass $variables, this variables will be replaced
-	 *
-	 * @param string $token
-	 * @param array $variables - key: placeholder of the variable
-	 * 							  value: value to replace the placeholder with
-	 * @return string
-	 */
+    
+    /**
+     * Translate token for the respective language.
+     * If there is no translation possible, token is returned
+     *
+     * Translations can have variables (ex: {{var1}}, with brackets {{}})
+     * If you pass $variables, this variables will be replaced
+     *
+     * @param string $token
+     * @param array $variables - key: placeholder of the variable
+     * 							  value: value to replace the placeholder with
+     * @return string
+     * @throws PlatformException
+     */
 	public function translate(string $token, array $variables = []): string
 	{
 		if ($this->translationFile === null) {
