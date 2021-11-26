@@ -83,7 +83,7 @@ class Translator
 	{
 		if ($locale != $this->locale) {
 			$this->translationFile = null;
-			$this->locale = $locale;
+			$this->locale = strtolower($locale);
 		}
 		return $this;
 	}

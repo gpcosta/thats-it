@@ -99,23 +99,6 @@ class BrowserLanguage
 		}
 		return null;
 	}
-	
-	/**
-	 * Will get the most appropriate country (ISO 639-1) from the available ones
-	 * @note: the country returned is based on languages from $request->getBrowserLanguage()
-	 * 		  it is not the most reliable method to get current country of the user
-	 *
-	 * @param array $availableCountries - if is passed an empty array, the country with
-	 * 									   the most suitable factor is returned (bigger q factor)
-	 * @param null|string $defaultValue
-	 * @return null|string
-	 */
-    public function getMostAppropriateISOCountryBasedOnLanguage(array $availableCountries = [],
-																 ?string $defaultValue = null): ?string
-	{
-		// passing countries ordered by "q" factor
-		return $this->getFirstAvailableFrom(array_keys($this->countries), $availableCountries, $defaultValue);
-	}
     
     /**
      * @param string $language
