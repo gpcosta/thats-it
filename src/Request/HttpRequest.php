@@ -468,6 +468,31 @@ class HttpRequest
 		return $this->getServerVariable('REMOTE_ADDR');
 	}
 	
+    /**
+     * @return array
+     */
+    public function getInfoBasedOnIp(): array
+    {
+        static $ipInfo;
+        if ($ipInfo !== null)
+            return $ipInfo;
+        
+        $response = (new CurlRequest('https://api.freegeoip.app/json/'.$this->getIpAddress().
+            '?apikey='.Configurations::getFieldFromConfig('freegeoipApiKey'),
+            'GET'))
+            ->send();
+        $response = json_decode($response, true);
+        if (!is_array($response))
+            $response = [];
+        $ipInfo = [];
+        $ipInfo['ip'] = $this->getIpAddress();
+        $ipInfo['country'] = isset($response['country_code']) ? $response['country_code'] : '';
+        $ipInfo['region'] = isset($response['region_name']) ? $response['region_name'] : '';
+        $ipInfo['city'] = isset($response['city']) ? $response['city'] : '';
+        $ipInfo['timezone'] = isset($response['time_zone']) ? $response['time_zone'] : '';
+        return $ipInfo;
+    }
+	
 	/**
 	 * Obtain the several suggested languages by the browser for the current user
 	 * All suggested languages have a suitability coefficient (q) for the current user

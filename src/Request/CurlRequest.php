@@ -120,6 +120,7 @@ class CurlRequest
 		$this->postFields = [];
 		$this->postFieldsFormat = self::CURL_POST_FIELDS_TO_QUERY;
 		$this->httpVersion = "CURL_HTTP_VERSION_1_1";
+		$this->httpHeaders = [];
 	
 		/*$this->encoding = "";
 		$this->port = 80;
