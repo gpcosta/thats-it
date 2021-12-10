@@ -194,7 +194,10 @@ class HttpRequest
 	 */
 	public function getAllParameters(): array
 	{
-		return array_merge($this->pathParameters, $this->queryParameters, $this->bodyParameters, $this->files);
+	    // if there is parameters with repeated names through some files, body, query or path
+        // the priority goes to what is in path then query then body then files and
+        // this is why the order of the merge is the following
+		return array_merge($this->files, $this->bodyParameters, $this->queryParameters, $this->pathParameters);
 	}
 	
 	/**
@@ -467,9 +470,11 @@ class HttpRequest
 	{
 		return $this->getServerVariable('REMOTE_ADDR');
 	}
-	
+    
     /**
      * @return array
+     * @throws MissingRequestMetaVariableException
+     * @throws \ThatsIt\Exception\PlatformException
      */
     public function getInfoBasedOnIp(): array
     {
