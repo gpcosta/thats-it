@@ -32,8 +32,9 @@ class View extends HttpResponse
      * View constructor.
      * @param $viewOrComponent - if it's a string, it is interpreted as the name of a view
      *                           else if it's a Component, it is used as Component
+     * @param $sanitizer - which Sanitizer is used
      */
-    public function __construct($viewOrComponent)
+    public function __construct($viewOrComponent, int $sanitizer = Sanitizer::SANITIZER_NONE)
     {
 		if ($viewOrComponent instanceof AppComponent) {
 			$this->component = $viewOrComponent;
@@ -42,7 +43,7 @@ class View extends HttpResponse
 			$this->pageToShow = $viewOrComponent;
 			$this->component = null;
 		}
-		$this->setSanitizer(Sanitizer::SANITIZER_HTML_ENCODE);
+		$this->setSanitizer($sanitizer);
 		$this->setHeader('Content-Type', 'text/html;charset=utf-8');
     }
     
@@ -52,17 +53,10 @@ class View extends HttpResponse
     public function getContent(): string
     {
         $content = "";
-    
-        // sanitize and encode all variables passed to View
-        if ($this->sanitizer !== Sanitizer::SANITIZER_NONE) {
-            foreach ($this->variables as $key => $value) {
-                $this->variables[$key] = Sanitizer::sanitize($value, $this->sanitizer);
-            }
-        }
         
         // if there is a page to show, it will show it
         if ($this->pageToShow) {
-            extract($this->variables);
+            extract($this->getSanitizedVariables());
             $t = function(string $token, array $variables = []) {
                 if ($this->translator)
                     return $this->translator->translate($token, $variables);

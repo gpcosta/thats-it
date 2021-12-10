@@ -91,7 +91,7 @@ class Sanitizer
 				return Encoding::toUTF8($value);
 			case Sanitizer::SANITIZER_HTML_ENCODE:
 				$value = self::getSanitizedValue(trim($value), self::SANITIZER_UTF8_ENCODE);
-				return htmlspecialchars($value, ENT_QUOTES|ENT_HTML5, 'UTF-8');
+				return htmlspecialchars($value, ENT_QUOTES|ENT_HTML5|ENT_SUBSTITUTE, 'UTF-8');
 			case self::SANITIZER_ALLOW_HTML:
 				$config = \HTMLPurifier_Config::createDefault();
 				$purifier = new \HTMLPurifier($config);

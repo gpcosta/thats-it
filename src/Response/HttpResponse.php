@@ -303,6 +303,22 @@ abstract class HttpResponse
     }
     
     /**
+     * Sanitize and encode all variables according with defined Sanitizer
+     * @return array
+     */
+    public function getSanitizedVariables(): array
+    {
+        if ($this->sanitizer === Sanitizer::SANITIZER_NONE)
+            return $this->variables;
+        
+        $sanitizedVariables = [];
+        foreach ($this->variables as $key => $value) {
+            $sanitizedVariables[$key] = Sanitizer::sanitize($value, $this->sanitizer);
+        }
+        return $sanitizedVariables;
+    }
+    
+    /**
      * @param string $environment
      */
     public function setEnvironment(string $environment): void
