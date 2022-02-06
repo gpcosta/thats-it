@@ -3,9 +3,9 @@
 namespace ThatsIt\Controller;
 
 use Monolog\Logger;
-use \PDO;
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Database\Database;
+use ThatsIt\Database\PDO;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Security\CSRFToken;
