@@ -105,13 +105,22 @@ class HttpRequest
 		$routeAndVars = $this->getChosenRouteAndVars(Configurations::getRoutesConfig());
 		$this->currentRoute = $routeAndVars['route'];
 		
-		$this->pathParameters = $this->getSanitizedParameters($routeAndVars['vars'], $this->currentRoute);
-		$this->queryParameters = $this->getSanitizedParameters($get, $this->currentRoute);
+		$this->pathParameters = $routeAndVars['vars'];
+		$this->queryParameters = $get;
 		if ($this->getServerVariable('CONTENT_TYPE', '') == 'application/json' ||
-				$this->getServerVariable('HTTP_CONTENT_TYPE', '') == 'application/json')
-			$this->bodyParameters = $this->getSanitizedParameters(json_decode($inputStream), $this->currentRoute);
-		else
-			$this->bodyParameters = $this->getSanitizedParameters($post, $this->currentRoute);
+            $this->getServerVariable('HTTP_CONTENT_TYPE', '') == 'application/json'
+        ) {
+            $this->bodyParameters = json_decode($inputStream);
+        } else {
+		    // try to decode $this->inputStream as JSON
+            $inputStreamResult = json_decode($this->inputStream);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // if $this->inputStream is not valid JSON, try to parse $this->inputStream as regular string with parameters
+                parse_str($this->inputStream, $inputStreamResult);
+            }
+            // merge both $inputStreamResult and $post - for the same key, $post values are used
+		    $this->bodyParameters = array_merge($inputStreamResult, $post);
+        }
 	}
 	
 	/**
@@ -159,6 +168,8 @@ class HttpRequest
 	}
 	
 	/**
+     * Not used and probably is not needed, since there is no need to sanitize the input but only the output
+     *
 	 * Sanitize $givenParameters with the provided sanitizer
 	 * methods provided by $currentRouteParameters
 	 *
