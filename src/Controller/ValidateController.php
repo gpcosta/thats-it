@@ -71,16 +71,13 @@ class ValidateController
 	 * @var array
 	 */
 	private $populatedParameters;
-	
-	/**
-	 * ValidateController constructor.
-	 * @param string $controllerName
-	 * @param string $methodName
-	 * @param array $routeParameters
-	 * @param array $givenParameters
-	 * @throws PlatformException
-	 * @throws \ReflectionException
-	 */
+    
+    /**
+     * ValidateController constructor.
+     * @param HttpRequest $request
+     * @throws PlatformException
+     * @throws \ReflectionException
+     */
 	public function __construct(HttpRequest $request)
 	{
 		$this->controllerName = $request->getCurrentRoute()->getController();
@@ -141,8 +138,9 @@ class ValidateController
 				"Controller method has to return a class that implements ThatsIt\\Response\\HttpResponse class.",
 				PlatformException::ERROR_RESPONSE
 			);
-		
-		return $response;
+        
+        $interceptResponseMethod = $this->reflectionController->getMethod('interceptResponse');
+		return $interceptResponseMethod->invoke($this->controller, $response);
 	}
 	
 	/**

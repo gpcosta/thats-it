@@ -8,6 +8,7 @@ use ThatsIt\Database\Database;
 use ThatsIt\Database\PDO;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Request\HttpRequest;
+use ThatsIt\Response\HttpResponse;
 use ThatsIt\Security\CSRFToken;
 
 /**
@@ -61,6 +62,15 @@ abstract class AbstractController
 		
 		$this->csrfToken = CSRFToken::getCSRFTokenFromCookies($request);
 	}
+    
+    /**
+     * @param HttpResponse $response
+     * @return HttpResponse
+     */
+	function interceptResponse(HttpResponse $response): HttpResponse
+    {
+        return $response;
+    }
 	
 	/**
 	 * @return string
