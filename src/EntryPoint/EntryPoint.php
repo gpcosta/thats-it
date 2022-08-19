@@ -92,7 +92,8 @@ class EntryPoint
 			$validateController->callConstructor($this->environment, $this->request, $this->logger);
 			$response = $validateController->callMethod();
 			$response->setEnvironment($this->environment);
-			$response->setCurrentUrl($this->request->getPath());
+			$response->setCurrentFullUrl($this->request->getHost(true).$this->request->getUri());
+			$response->setCurrentUrlPath($this->request->getHost(true).$this->request->getPath());
 			
 			$send = new SendResponse($response);
 			$send->send();

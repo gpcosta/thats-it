@@ -60,7 +60,12 @@ abstract class HttpResponse
 	/**
 	 * @var string
 	 */
-    protected $currentUrl = '';
+    protected $currentFullUrl = '';
+    
+    /**
+     * @var string
+     */
+    protected $currentUrlPath = '';
     
     /**
      * @var int - constant from Sanitizer
@@ -339,20 +344,36 @@ abstract class HttpResponse
     }
 	
 	/**
-	 * @param string $currentUrl
+	 * @param string $currentFullUrl
 	 */
-	public function setCurrentUrl(string $currentUrl): void
+	public function setCurrentFullUrl(string $currentFullUrl): void
 	{
-		$this->currentUrl = $currentUrl;
+		$this->currentFullUrl = $currentFullUrl;
 	}
-	
-	/**
-	 * @return string
-	 */
-	public function getCurrentUrl(): string
-	{
-		return $this->currentUrl;
-	}
+    
+    /**
+     * @return string
+     */
+    public function getCurrentFullUrl(): string
+    {
+        return $this->currentFullUrl;
+    }
+    
+    /**
+     * @param string $currentUrlPath
+     */
+    public function setCurrentUrlPath(string $currentUrlPath): void
+    {
+        $this->currentUrlPath = $currentUrlPath;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getCurrentUrlPath(): string
+    {
+        return $this->currentUrlPath;
+    }
     
     /**
      * @param Translator $translator
