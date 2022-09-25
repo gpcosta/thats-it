@@ -122,9 +122,9 @@ class Route
 	}
     
     /**
-     * @return null|string
+     * @return string
      */
-	public function getErrorController(): ?string
+	public function getErrorController(): string
 	{
 		return $this->errorController;
 	}
