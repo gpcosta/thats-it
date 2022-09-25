@@ -128,13 +128,26 @@ class Configurations
      * @return string
      * @throws PlatformException
      */
-	public static function getDomain(): string
+	public static function getHost(): string
 	{
 		$config = self::getGeneralConfig();
-		if (!array_key_exists('domain', $config))
-			throw new PlatformException('There is no domain defined in config/config.php',
+		if (!array_key_exists('host', $config))
+			throw new PlatformException('There is no host defined in config/config.php',
 				PlatformException::ERROR_CONFIG_LINE_MISSING);
-		return $config['domain'];
+		return $config['host'];
+	}
+    
+    /**
+     * @return string
+     * @throws PlatformException
+     */
+	public static function getScheme(): string
+	{
+		$config = self::getGeneralConfig();
+		if (!array_key_exists('scheme', $config))
+			throw new PlatformException('There is no scheme defined in config/config.php',
+				PlatformException::ERROR_CONFIG_LINE_MISSING);
+		return $config['scheme'];
 	}
     
     /**
@@ -143,9 +156,9 @@ class Configurations
      * @return string
      * @throws PlatformException
      */
-    public static function getHost(bool $withHttp = true, bool $isSecure = true): string
+    public static function getSchemeAndHost(): string
     {
-        return ($withHttp ? 'http' . ($isSecure ? 's' : '') . '://' : '') . self::getDomain();
+        return self::getScheme() . '://' . self::getHost();
     }
 	
     /**

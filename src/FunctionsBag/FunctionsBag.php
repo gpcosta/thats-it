@@ -80,12 +80,12 @@ class FunctionsBag
 	 * @param array $variables [name => value]
 	 * @param bool $withOptional (url with optional part or not. when there is no optional part, doesn't matter its value)
      *                           - this parameter is deprecated and any value that is passed here is ignored
-	 * @param bool $addDomain (if true, will add the domain to the url)
+	 * @param bool $addSchemeAndHost (if true, will add the scheme and host to the url)
 	 * @return string
 	 * @throws PlatformException
 	 */
 	public static function getUrl(string $name, array $variables = [], bool $withOptional = false,
-								  bool $addDomain = false): string
+								  bool $addSchemeAndHost = false): string
 	{
 		static $routes;
 		
@@ -167,7 +167,7 @@ class FunctionsBag
 				PlatformException::ERROR_NOT_FOUND_DANGER);
 		}
 		
-		if ($addDomain) $path = Configurations::getDomain() . $path;
+		if ($addSchemeAndHost) $path = Configurations::getSchemeAndHost() . $path;
 		
 		return $path;
 	}

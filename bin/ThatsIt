@@ -15,7 +15,7 @@ then
     echo 'return [' >> config/config.php
     echo -e '\t"environment" => "development", // or "production" when you'"'"'re ready for it :)' >> config/config.php
     echo -e '\t"locationServer" => "'$(pwd)'/src/Public", // where you put index.php' >> config/config.php
-    echo -e '\t"domain" => "your_domain.example.com", // "http://localhost"' >> config/config.php
+    echo -e '\t"host" => "your_domain.example.com", // "http://localhost"' >> config/config.php
     echo -e '\t"datacenterId" => 0, // min of 0 and max of 31 => 0 <= datacenterId <= 31' >> config/config.php
     echo -e '\t"workerId" => 0 // min of 0 and max of 31 => 0 <= workerId <= 31' >> config/config.php
     echo '];' >> config/config.php
@@ -102,70 +102,26 @@ then
     echo "Created src/View/Error/"
 fi
 
-if [ ! -e "src/View/Error/error404.php" ];
+if [ ! -e "src/View/Error/error.php" ];
 then
-    echo "<?php" >> src/View/Error/error404.php
-    echo >> src/View/Error/error404.php
-    echo "// this page represents the not found requests" >> src/View/Error/error404.php
-    echo >> src/View/Error/error404.php
-    echo "// in this page you will have the variable $error available" >> src/View/Error/error404.php
-    echo "// this variable will have the message of the error" >> src/View/Error/error404.php
-    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error404.php
-    echo >> src/View/Error/error404.php
-    echo "?>" >> src/View/Error/error404.php
-    echo >> src/View/Error/error404.php
-    echo "<html>" >> src/View/Error/error404.php
-    echo -e "\t<div>" >> src/View/Error/error404.php
-    echo -e     "\t\tError 404!^<br^>" >> src/View/Error/error404.php
-    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error404.php
-    echo -e "\t</div>" >> src/View/Error/error404.php
-    echo "</html>" >> src/View/Error/error404.php
+    echo "<?php" >> src/View/Error/error.php
+    echo >> src/View/Error/error.php
+    echo "// this page represents the 'any non treated error' errors" >> src/View/Error/error.php
+    echo "// (when something unexpected happen)" >> src/View/Error/error.php
+    echo >> src/View/Error/error.php
+    echo "// in this page you will have the variable $error available" >> src/View/Error/error.php
+    echo "// this variable will have the message of the error" >> src/View/Error/error.php
+    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error.php
+    echo "// in this page it still exists $statusCode available" >> src/View/Error/error.php
+    echo >> src/View/Error/error.php
+    echo "?>" >> src/View/Error/error.php
+    echo >> src/View/Error/error.php
+    echo "<html>" >> src/View/Error/error.php
+    echo -e "\t<div>" >> src/View/Error/error.php
+    echo -e     "\t\tError <?php echo $statusCode; ?>!^<br^>" >> src/View/Error/error.php
+    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error.php
+    echo -e "\t</div>" >> src/View/Error/error.php
+    echo "</html>" >> src/View/Error/error.php
 
-    echo "Created src/View/Error/error404.php"
-fi
-
-if [ ! -e "src/View/Error/error405.php" ];
-then
-    echo "<?php" >> src/View/Error/error405.php
-    echo >> src/View/Error/error405.php
-    echo "// this page represents the 'method not allowed' errors" >> src/View/Error/error405.php
-    echo "// (when user doesn't provide all needed info or make a POST instead a GET for example)" >> src/View/Error/error405.php
-    echo >> src/View/Error/error405.php
-    echo "// in this page you will have the variable $error available" >> src/View/Error/error405.php
-    echo "// this variable will have the message of the error" >> src/View/Error/error405.php
-    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error405.php
-    echo >> src/View/Error/error405.php
-    echo "?>" >> src/View/Error/error405.php
-    echo >> src/View/Error/error405.php
-    echo "<html>" >> src/View/Error/error405.php
-    echo -e "\t<div>" >> src/View/Error/error405.php
-    echo -e     "\t\tError 405!^<br^>" >> src/View/Error/error405.php
-    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error405.php
-    echo -e "\t</div>" >> src/View/Error/error405.php
-    echo "</html>" >> src/View/Error/error405.php
-
-    echo "Created src/View/Error/error405.php"
-fi
-
-if [ ! -e "src/View/Error/error500.php" ];
-then
-    echo "<?php" >> src/View/Error/error500.php
-    echo >> src/View/Error/error500.php
-    echo "// this page represents the 'internal server error' errors" >> src/View/Error/error500.php
-    echo "// (when something unexpected happen)" >> src/View/Error/error500.php
-    echo >> src/View/Error/error500.php
-    echo "// in this page you will have the variable $error available" >> src/View/Error/error500.php
-    echo "// this variable will have the message of the error" >> src/View/Error/error500.php
-    echo "// this will have the last message that you passed to an exception" >> src/View/Error/error500.php
-    echo >> src/View/Error/error500.php
-    echo "?>" >> src/View/Error/error500.php
-    echo >> src/View/Error/error500.php
-    echo "<html>" >> src/View/Error/error500.php
-    echo -e "\t<div>" >> src/View/Error/error500.php
-    echo -e     "\t\tError 500!^<br^>" >> src/View/Error/error500.php
-    echo -e     "\t\t<?php echo $error; ?>" >> src/View/Error/error500.php
-    echo -e "\t</div>" >> src/View/Error/error500.php
-    echo "</html>" >> src/View/Error/error500.php
-
-    echo "Created src/View/Error/error500.php"
+    echo "Created src/View/Error/error.php"
 fi
