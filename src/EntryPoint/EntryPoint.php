@@ -7,6 +7,7 @@ use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use ThatsIt\Controller\ErrorController;
 use ThatsIt\Controller\ValidateController;
 use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\ExceptionWithHTTPResponse;
@@ -74,7 +75,7 @@ class EntryPoint
 				$this->sendErrorMessage(
 					500,
 					"The service that you are trying to contact cannot fulfill your request at the moment.",
-					'Error/error500'
+					'Error/error'
 				);
 			}
 		}
@@ -87,8 +88,8 @@ class EntryPoint
 	 */
 	public function callController()
 	{
-		try {
-			$validateController = new ValidateController($this->request);
+        $validateController = new ValidateController($this->request);
+        try {
 			$validateController->callConstructor($this->environment, $this->request, $this->logger);
 			$response = $validateController->callMethod();
 			$response->setEnvironment($this->environment);
@@ -110,37 +111,9 @@ class EntryPoint
 			}
 			$sendError = new SendResponse($e->getResponse());
 			$sendError->send();
-		} catch (ClientException $e) {
-			$this->logger->addWarning($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
-			if ($e->getCode() == 404) $this->sendErrorMessage(404, $e->getMessage(), 'Error/error404');
-			else if ($e->getCode() == 405) $this->sendErrorMessage(405, $e->getMessage(), 'Error/error405');
-			else $this->sendErrorMessage(500, $e->getMessage(), 'Error/error500');
-		} catch (PlatformException | \PDOException | \Exception $e) {
-			if ($e instanceof PlatformException)
-				$this->logger->addError($e->getMessage(), ["code" => $e->getCode(), "exception" => $e]);
-			else if ($e instanceof \PDOException)
-				$this->logger->addError($e->getMessage(), ["code" => PlatformException::ERROR_DB, "exception" => $e]);
-			else
-				$this->logger->addEmergency($e->getMessage(), ["code" => PlatformException::ERROR_UNDEFINED, "exception" => $e]);
-			
-			if ($this->environment == 'production') {
-				$this->sendErrorMessage(
-					500,
-					"Something wrong happened. Please try again.",
-					'Error/error500'
-				);
-			} else {
-				throw $e;
-			}
+		} catch (\ErrorException | \Exception $e) {
+            $sendError = new SendResponse($validateController->getErrorResponse($e, $this->logger, $this->environment));
+            $sendError->send();
 		}
-	}
-	
-	private function sendErrorMessage(int $statusCode, string $error, string $page): void
-	{
-		$response = new View($page);
-		$response->setStatusCode($statusCode);
-		$response->addVariable('error', $error);
-		$send = new SendResponse($response);
-		$send->send();
 	}
 }

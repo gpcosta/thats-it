@@ -88,7 +88,9 @@ class ValidateController
 		$this->routeParameters = $request->getCurrentRoute()->getParameters();
 		$this->givenParameters = $request->getAllParameters();
 		$this->populatedParameters = $this->getPopulatedParameters();
-	}
+		
+		$this->errorControllerName = $request->getCurrentRoute()->getErrorController();
+    }
 	
 	/**
 	 * @param string $environment
@@ -142,6 +144,28 @@ class ValidateController
         $interceptResponseMethod = $this->reflectionController->getMethod('interceptResponse');
 		return $interceptResponseMethod->invoke($this->controller, $response);
 	}
+    
+    /**
+     * @param \Exception $exception
+     * @param Logger $logger
+     * @param string $environment
+     * @return HttpResponse
+     * @throws PlatformException
+     * @throws \ReflectionException
+     */
+	public function getErrorResponse(\Exception $exception, Logger $logger, string $environment): HttpResponse
+    {
+        $reflectionErrorController = new \ReflectionClass($this->errorControllerName);
+        $errorController = $reflectionErrorController->newInstanceArgs([$exception, $logger, $environment]);
+        if (!($errorController instanceof ErrorController)) {
+            $exception = new PlatformException(
+                'The controller used to interpret errors must extends from ThatsIt\\Controller\\ErrorController.',
+                500
+            );
+            return (new ErrorController($exception, $logger, $environment))->getHttpResponseBasedOnError();
+        }
+        return $errorController->getHttpResponseBasedOnError();
+    }
 	
 	/**
 	 * @return array
