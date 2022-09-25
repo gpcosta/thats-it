@@ -8,6 +8,7 @@
 
 namespace ThatsIt\Request;
 
+use ThatsIt\Controller\ErrorController;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Sanitizer\Sanitizer;
 
@@ -36,6 +37,11 @@ class Route
 	 * @var string
 	 */
 	private $controller;
+    
+    /**
+     * @var null|string
+     */
+	private $errorController;
 	
 	/**
 	 * @var string
@@ -75,6 +81,8 @@ class Route
 		$this->path = $routeArray['path'];
 		$this->httpMethods = $routeArray['httpMethods'];
 		$this->controller = $routeArray['controller'];
+		$this->errorController = isset($routeArray['errorController']) ? $routeArray['errorController'] :
+            ErrorController::class;
 		$this->function = $routeArray['function'];
 		$this->parameters = $routeArray['parameters'];
 		$this->sanitizer = isset($routeArray['sanitizer']) ? $routeArray['sanitizer'] : Sanitizer::SANITIZER_NONE;
@@ -111,6 +119,14 @@ class Route
 	public function getController(): string
 	{
 		return $this->controller;
+	}
+    
+    /**
+     * @return null|string
+     */
+	public function getErrorController(): ?string
+	{
+		return $this->errorController;
 	}
 	
 	/**
