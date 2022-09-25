@@ -104,7 +104,7 @@ if not exist "src/View/Error/error.php" (
     echo.>> src/View/Error/error.php
     echo ^<html^>>> src/View/Error/error.php
     echo    ^<div^>>> src/View/Error/error.php
-    echo        Error <?php echo $statusCode; ?>!^<br^>>> src/View/Error/error.php
+    echo        Error ^<^?php echo $statusCode; ^?^>!^<br^>>> src/View/Error/error.php
     echo        ^<^?php echo $error; ^?^>>> src/View/Error/error.php
     echo    ^</div^>>> src/View/Error/error.php
     echo ^</html^>>> src/View/Error/error.php
