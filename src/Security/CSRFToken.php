@@ -11,6 +11,7 @@ namespace ThatsIt\Security;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\Cookie;
 use ThatsIt\Response\HttpResponse;
+use ThatsIt\Session\IDGenerator;
 
 /**
  * Class CSRFToken
