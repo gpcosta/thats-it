@@ -25,11 +25,11 @@ class RawResponse extends HttpResponse
     }
     
     /**
-     * @return string
+     * Echo the body content.
      */
-    public function getContent(): string
+    public function sendContent(): void
     {
-        return $this->content;
+        echo $this->content;
     }
 	
 	/**

@@ -2,22 +2,16 @@
 
 namespace ThatsIt\EntryPoint;
 
-use FastRoute\Dispatcher;
-use FastRoute\RouteCollector;
-use function FastRoute\simpleDispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use ThatsIt\Controller\ErrorController;
+use Psr\Log\LoggerInterface;
 use ThatsIt\Controller\ValidateController;
-use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\ExceptionWithHTTPResponse;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Folder\Folder;
-use ThatsIt\FunctionsBag\FunctionsBag;
 use ThatsIt\Request\HttpRequest;
-use ThatsIt\Response\SendResponse;
+use ThatsIt\Response\JsonResponse;
 use ThatsIt\Response\View;
-use ThatsIt\Sanitizer\Sanitizer;
 
 /**
  * Class EntryPoint
@@ -46,7 +40,7 @@ class EntryPoint
 	private $environment;
 	
 	/**
-	 * @var Logger
+	 * @var LoggerInterface
 	 */
 	private $logger;
 	
@@ -70,12 +64,18 @@ class EntryPoint
 			$this->logger->pushHandler(new StreamHandler(Folder::getLogFolder() . "/critical.log", Logger::CRITICAL, false));
 			$this->logger->pushHandler(new StreamHandler(Folder::getLogFolder() . "/alert.log", Logger::ALERT, false));
 			$this->logger->pushHandler(new StreamHandler(Folder::getLogFolder() . "/emergency.log", Logger::EMERGENCY, false));
+			
+			//$this->logger->info('Request: ' . $this->request->getRawBody());
 		} catch (\Exception $e) {
 			if ($this->environment == 'production') {
-				$this->sendErrorMessage(
+				$this->sendJsonErrorMessage(
 					500,
-					"The service that you are trying to contact cannot fulfill your request at the moment.",
-					'Error/error'
+                    [
+                        'status' => [
+                            'code' => 500,
+                            'message' => 'The service that you are trying to contact cannot fulfill your request at the moment.'
+                        ]
+                    ]
 				);
 			}
 		}
@@ -95,9 +95,7 @@ class EntryPoint
 			$response->setEnvironment($this->environment);
 			$response->setCurrentFullUrl($this->request->getHost(true).$this->request->getUri());
 			$response->setCurrentUrlPath($this->request->getHost(true).$this->request->getPath());
-			
-			$send = new SendResponse($response);
-			$send->send();
+			$response->send();
 		} catch (ExceptionWithHTTPResponse $e) {
 			if ($e->getLoggerLevel() !== ExceptionWithHTTPResponse::LOGGER_LEVEL_NO_LOG) {
 				$this->logger->addRecord($e->getLoggerLevel(), $e->getMessage(), [
@@ -109,11 +107,34 @@ class EntryPoint
 					'context' => $e->getContext()
 				]);
 			}
-			$sendError = new SendResponse($e->getResponse());
-			$sendError->send();
+			$e->getResponse()->send();
 		} catch (\ErrorException | \Exception $e) {
-            $sendError = new SendResponse($validateController->getErrorResponse($e, $this->logger, $this->environment));
-            $sendError->send();
+            $validateController->getErrorResponse($this->environment, $this->request, $this->logger, $e)->send();
 		}
 	}
+    
+    /**
+     * @param int $statusCode
+     * @param array $message
+     */
+    public static function sendJsonErrorMessage(int $statusCode, array $message): void
+    {
+        $response = new JsonResponse();
+        $response->setStatusCode($statusCode);
+        $response->setVariables($message);
+        $response->send();
+    }
+    
+    /**
+     * @param string $page
+     * @param int $statusCode
+     * @param string $error
+     */
+    public static function sendViewErrorMessage(string $page, int $statusCode, string $error): void
+    {
+        $response = new View($page);
+        $response->setStatusCode($statusCode);
+        $response->addVariable('error', $error);
+        $response->send();
+    }
 }

@@ -8,9 +8,11 @@
 
 namespace ThatsIt\Controller;
 
-use Monolog\Logger;
+use Exception;
+use Psr\Log\LoggerInterface;
 use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\PlatformException;
+use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\HttpResponse;
 use ThatsIt\Response\View;
 
@@ -21,67 +23,68 @@ use ThatsIt\Response\View;
 class ErrorController
 {
     /**
-     * @var \Exception
-     */
-    protected $exception;
-    
-    /**
-     * @var Logger 
-     */
-    protected $logger;
-    
-    /**
-     * @var string 
+     * @var string
      */
     protected $environment;
     
     /**
-     * ErrorController constructor.
-     * @param \Exception $e
-     * @param Logger $logger
-     * @param string $environment
+     * @var HttpRequest
      */
-    public function __construct(\Exception $e, Logger $logger, string $environment)
+    protected $request;
+    
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    
+    /**
+     * ErrorController constructor.
+     * @param string $environment
+     * @param HttpRequest $request
+     * @param LoggerInterface $logger
+     */
+    public function __construct(string $environment, HttpRequest $request, LoggerInterface $logger)
     {
-        $this->exception = $e;
-        $this->logger = $logger;
         $this->environment = $environment;
+        $this->request = $request;
+        $this->logger = $logger;
     }
     
     /**
      * This method returns an HttpResponse that treats its error/exception
      * If this method throws an exception, the exception will be catched by filp\Whoops library
-     * 
+     *
+     * @param $exception
      * @return HttpResponse
      * @throws \Exception
      */
-    public function getHttpResponseBasedOnError(): HttpResponse
+    public function getHttpResponseBasedOnError(Exception $exception): HttpResponse
     {
-        if ($this->exception instanceof ClientException) {
-            $this->logger->addWarning($this->exception->getMessage(), [
-                'code' => $this->exception->getCode(),
-                'exception' => $this->exception
+        if ($exception instanceof ClientException) {
+            $this->logger->warning($exception->getMessage(), [
+                'code' => $exception->getCode(),
+                'exception' => $exception
             ]);
             $response = new View('Error/error');
-            $response->addVariable('error', $this->exception->getMesssage());
-            $response->addVariable('statusCode', $this->exception->getCode());
-            $response->setStatusCode($this->exception->getCode());
+            $response->addVariable('error', $exception->getMesssage());
+            $response->addVariable('statusCode', $exception->getCode());
+            $response->setStatusCode($exception->getCode());
             return $response;
         } else {
-            if ($this->exception instanceof PlatformException)
-                $this->logger->addError($this->exception->getMessage(), [
-                    'code' => $this->exception->getCode(),
-                    'exception' => $this->exception
+            if ($exception instanceof PlatformException)
+                $this->logger->error($exception->getMessage(), [
+                    'code' => $exception->getCode(),
+                    'exception' => $exception
                 ]);
-            else if ($this->exception instanceof \PDOException)
-                $this->logger->addError($this->exception->getMessage(), [
+            else if ($exception instanceof \PDOException)
+                $this->logger->error($exception->getMessage(), [
                     'code' => PlatformException::ERROR_DB,
-                    'exception' => $this->exception
+                    'exception' => $exception
                 ]);
             else
-                $this->logger->addEmergency($this->exception->getMessage(), [
+                $this->logger->emergency($exception->getMessage(), [
                     'code' => PlatformException::ERROR_UNDEFINED,
-                    'exception' => $this->exception
+                    'exception' => $exception
                 ]);
         
             if ($this->environment == 'production') {
@@ -91,7 +94,7 @@ class ErrorController
                 $response->setStatusCode(500);
                 return $response;
             } else {
-                throw $this->exception;
+                throw $exception;
             }
         }
     }

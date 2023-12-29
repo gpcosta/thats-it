@@ -14,6 +14,7 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-curl": "*",
+        "ext-fileinfo": "*",
         "nikic/fast-route": "^1.3",
         "filp/whoops": "^2.4",
         "monolog/monolog": "^1.24",

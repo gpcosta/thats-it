@@ -31,7 +31,7 @@ class RedirectResponse extends HttpResponse
             $statusCode = 302;
         
         $this->setHeader('Location', $this->url);
-        $this->setStatusCode($this->statusCode);
+        $this->setStatusCode($statusCode);
     }
     
     /**
@@ -59,10 +59,11 @@ class RedirectResponse extends HttpResponse
     
     /**
      * There is no content in this RedirectResponse
-     *
-     * @return string
      */
-    public function getContent(): string { return ""; }
+    public function sendContent(): void
+    {
+        return;
+    }
     
     /**
      * Return the url formed with the addition of the current variables

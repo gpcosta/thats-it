@@ -34,7 +34,7 @@ class View extends HttpResponse
      *                           else if it's a Component, it is used as Component
      * @param $sanitizer - which Sanitizer is used
      */
-    public function __construct($viewOrComponent, int $sanitizer = Sanitizer::SANITIZER_NONE)
+    public function __construct($viewOrComponent, int $sanitizer = Sanitizer::SANITIZER_HTML_ENCODE)
     {
 		if ($viewOrComponent instanceof AppComponent) {
 			$this->component = $viewOrComponent;
@@ -47,10 +47,7 @@ class View extends HttpResponse
 		$this->setHeader('Content-Type', 'text/html;charset=utf-8');
     }
     
-    /**
-     * @return string
-     */
-    public function getContent(): string
+    public function sendContent(): void
     {
         $content = "";
         
@@ -71,6 +68,6 @@ class View extends HttpResponse
         else if ($this->component && $this->component instanceof AppComponent) {
             $content = $this->component->render();
         }
-        return $content;
+        echo $content;
     }
 }

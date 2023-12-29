@@ -8,7 +8,8 @@
 
 namespace ThatsIt\Controller;
 
-use Monolog\Logger;
+use Exception;
+use Psr\Log\LoggerInterface;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\NullObject;
 use ThatsIt\Request\HttpRequest;
@@ -73,6 +74,11 @@ class ValidateController
 	private $populatedParameters;
     
     /**
+     * @var string
+     */
+	private $errorControllerName;
+    
+    /**
      * ValidateController constructor.
      * @param HttpRequest $request
      * @throws PlatformException
@@ -95,10 +101,10 @@ class ValidateController
 	/**
 	 * @param string $environment
 	 * @param HttpRequest $request
-	 * @param Logger $logger
+	 * @param LoggerInterface $logger
 	 * @return ValidateController
 	 */
-	public function callConstructor(string $environment, HttpRequest $request, Logger $logger): self
+	public function callConstructor(string $environment, HttpRequest $request, LoggerInterface $logger): self
 	{
 		$constructorParameters = $this->reflectionController->getConstructor()->getParameters();
 		$args = [$environment, $request, $logger];
@@ -147,24 +153,25 @@ class ValidateController
     
     /**
      * @param \Exception $exception
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      * @param string $environment
      * @return HttpResponse
      * @throws PlatformException
      * @throws \ReflectionException
      */
-	public function getErrorResponse(\Exception $exception, Logger $logger, string $environment): HttpResponse
+	public function getErrorResponse(string $environment, HttpRequest $request, LoggerInterface $logger,
+                                     Exception $exception): HttpResponse
     {
         $reflectionErrorController = new \ReflectionClass($this->errorControllerName);
-        $errorController = $reflectionErrorController->newInstanceArgs([$exception, $logger, $environment]);
+        $errorController = $reflectionErrorController->newInstanceArgs([$environment, $request, $logger]);
         if (!($errorController instanceof ErrorController)) {
             $exception = new PlatformException(
                 'The controller used to interpret errors must extends from ThatsIt\\Controller\\ErrorController.',
                 500
             );
-            return (new ErrorController($exception, $logger, $environment))->getHttpResponseBasedOnError();
+            return (new ErrorController($environment, $request, $logger))->getHttpResponseBasedOnError($exception);
         }
-        return $errorController->getHttpResponseBasedOnError();
+        return $errorController->getHttpResponseBasedOnError($exception);
     }
 	
 	/**

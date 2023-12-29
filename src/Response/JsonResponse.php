@@ -8,6 +8,8 @@
 
 namespace ThatsIt\Response;
 
+use ThatsIt\Sanitizer\Sanitizer;
+
 /**
  * Class JsonResponse
  * @package ThatsIt\Response
@@ -20,13 +22,14 @@ class JsonResponse extends HttpResponse
     public function __construct()
     {
         $this->setHeader('Content-Type', 'application/json;charset=utf-8');
+        $this->setSanitizer(Sanitizer::SANITIZER_UTF8_ENCODE);
     }
     
     /**
-     * @return string
+     * Echo the body content.
      */
-    public function getContent(): string
+    public function sendContent(): void
     {
-        return json_encode($this->variables, JSON_PRETTY_PRINT);
+        echo json_encode($this->variables, JSON_PRETTY_PRINT);
     }
 }

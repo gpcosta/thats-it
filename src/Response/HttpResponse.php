@@ -144,11 +144,9 @@ abstract class HttpResponse
     ];
     
     /**
-     * Returns the body content.
-     *
-     * @return string
+     * Echo the body content.
      */
-    abstract public function getContent(): string;
+    abstract public function sendContent(): void;
     
     /**
      * Sets the HTTP status code.
@@ -179,17 +177,6 @@ abstract class HttpResponse
     }
     
     /**
-     * Adds a header with the given name.
-     *
-     * @param string $name
-     * @param $value
-     */
-    public function addHeader(string $name, $value): void
-    {
-        $this->headers[$name][] = (string) $value;
-    }
-    
-    /**
      * Sets a new header for the given name.
      *
      * Replaces all headers with the same names.
@@ -199,9 +186,7 @@ abstract class HttpResponse
      */
     public function setHeader(string $name, $value): void
     {
-        $this->headers[$name] = [
-            (string) $value,
-        ];
+        $this->headers[$name] = [(string) $value];
     }
     
     /**
@@ -313,12 +298,12 @@ abstract class HttpResponse
      */
     public function getSanitizedVariables(): array
     {
-        if ($this->sanitizer === Sanitizer::SANITIZER_NONE)
-            return $this->variables;
-        
         $sanitizedVariables = [];
         foreach ($this->variables as $key => $value) {
-            $sanitizedVariables[$key] = Sanitizer::sanitize($value, $this->sanitizer);
+            if (is_array($value) && isset($value['sanitizer']))
+                $sanitizedVariables[$key] = Sanitizer::sanitize($value, $value['sanitizer']);
+            else
+                $sanitizedVariables[$key] = Sanitizer::sanitize($value, $this->sanitizer);
         }
         return $sanitizedVariables;
     }
@@ -410,6 +395,7 @@ abstract class HttpResponse
     /**
      * @param string $token
      * @return string
+     * @throws \ThatsIt\Exception\PlatformException
      */
     public function translation(string $token): string
     {
@@ -421,10 +407,22 @@ abstract class HttpResponse
     /**
      * @param string $token
      * @return string
+     * @throws \ThatsIt\Exception\PlatformException
      */
     public function t(string $token): string
     {
         return $this->translation($token);
+    }
+    
+    /**
+     * send http response
+     */
+    public function send(): void
+    {
+        foreach ($this->getHeaders() as $header)
+            header($header,false);
+        $this->sendContent();
+        die;
     }
     
     /**

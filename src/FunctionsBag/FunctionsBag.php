@@ -20,48 +20,6 @@ use ThatsIt\Exception\PlatformException;
 class FunctionsBag
 {
 	/**
-	 * @var null|string
-	 */
-	private static $routesPath = null;
-	
-	/**
-	 * @var string
-	 */
-	private static $httpHost = "";
-	
-	/**
-	 * @return null|string
-	 */
-	public static function getRoutesPath(): ?string
-	{
-		return self::$routesPath;
-	}
-	
-	/**
-	 * @param string $routesPath
-	 */
-	public static function setRoutesPath(string $routesPath): void
-	{
-		self::$routesPath = $routesPath;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public static function getHttpHost(): string
-	{
-		return self::$httpHost;
-	}
-	
-	/**
-	 * @param string $httpHost
-	 */
-	public static function setHttpHost(string $httpHost): void
-	{
-		self::$httpHost = $httpHost;
-	}
-    
-    /**
      * @param string $str
      * @return string
      */
@@ -90,7 +48,7 @@ class FunctionsBag
 		static $routes;
 		
 		// just to load routes once
-		if (!$routes) $routes = Configurations::getRoutesConfig(self::$routesPath);
+		if (!$routes) $routes = Configurations::getRoutesConfig();
 		
 		if (!isset($routes[$name])) {
 			throw new PlatformException("There are no url for '" . $name . "'",

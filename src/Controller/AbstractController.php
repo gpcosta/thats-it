@@ -2,10 +2,10 @@
 
 namespace ThatsIt\Controller;
 
-use Monolog\Logger;
+use PDO;
+use Psr\Log\LoggerInterface;
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Database\Database;
-use ThatsIt\Database\PDO;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\HttpResponse;
@@ -33,7 +33,7 @@ abstract class AbstractController
 	private $request;
 	
 	/**
-	 * @var Logger
+	 * @var LoggerInterface
 	 */
 	private $logger;
 	
@@ -41,15 +41,15 @@ abstract class AbstractController
 	 * @var null|CSRFToken
 	 */
 	private $csrfToken;
-	
-	/**
-	 * AbstractController constructor.
-	 * @param string $environment
-	 * @param HttpRequest $request
-	 * @param Logger $logger
-	 * @throws PlatformException
-	 */
-	public function __construct(string $environment, HttpRequest $request, Logger $logger)
+    
+    /**
+     * AbstractController constructor.
+     * @param string $environment
+     * @param HttpRequest $request
+     * @param LoggerInterface $logger
+     * @throws PlatformException
+     */
+	public function __construct(string $environment, HttpRequest $request, LoggerInterface $logger)
 	{
 		$this->db = new Database();
 		if (in_array($environment, [Configurations::ENVIRONMENT_DEV, Configurations::ENVIRONMENT_PROD])) {
@@ -89,9 +89,9 @@ abstract class AbstractController
 	}
 	
 	/**
-	 * @return Logger
+	 * @return LoggerInterface
 	 */
-	protected function getLogger(): Logger
+	protected function getLogger(): LoggerInterface
 	{
 		return $this->logger;
 	}

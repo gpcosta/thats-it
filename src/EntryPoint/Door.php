@@ -9,14 +9,9 @@
 namespace ThatsIt\EntryPoint;
 
 use ThatsIt\Configurations\Configurations;
-use ThatsIt\Exception\ClientException;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Folder\Folder;
-use ThatsIt\Logger\Logger;
 use ThatsIt\Request\HttpRequest;
-use ThatsIt\Response\JsonResponse;
-use ThatsIt\Response\SendResponse;
-use ThatsIt\Response\View;
 
 /**
  * Class Door
@@ -30,6 +25,7 @@ class Door
     /**
      * @param string $indexPath
      * @throws PlatformException
+     * @throws \ThatsIt\Request\Exception\MissingRequestMetaVariableException
      */
     public static function openDoor(string $indexPath): void
     {
@@ -63,32 +59,5 @@ class Door
             $environment
         );
         $entryPoint->callController();
-    }
-    
-    /**
-     * @param int $statusCode
-     * @param array $message
-     */
-    public static function sendJsonErrorMessage(int $statusCode, array $message): void
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode($statusCode);
-        $response->setVariables($message);
-        $send = new SendResponse($response);
-        $send->send();
-    }
-    
-    /**
-     * @param string $page
-     * @param int $statusCode
-     * @param string $error
-     */
-    public static function sendViewErrorMessage(string $page, int $statusCode, string $error): void
-    {
-        $response = new View($page);
-        $response->setStatusCode($statusCode);
-        $response->addVariable('error', $error);
-        $send = new SendResponse($response);
-        $send->send();
     }
 }

@@ -110,7 +110,7 @@ class HttpRequest
 		if ($this->getServerVariable('CONTENT_TYPE', '') == 'application/json' ||
             $this->getServerVariable('HTTP_CONTENT_TYPE', '') == 'application/json'
         ) {
-            $this->bodyParameters = json_decode($inputStream);
+            $this->bodyParameters = json_decode($inputStream, true);
         } else {
 		    // try to decode $this->inputStream as JSON
             $inputStreamResult = json_decode($this->inputStream);
@@ -121,6 +121,11 @@ class HttpRequest
             // merge both $inputStreamResult and $post - for the same key, $post values are used
 		    $this->bodyParameters = array_merge($inputStreamResult, $post);
         }
+        
+        // sanitize all parameters
+        $this->pathParameters = Sanitizer::sanitize($this->pathParameters, Sanitizer::SANITIZER_UTF8_ENCODE);
+        $this->queryParameters = Sanitizer::sanitize($this->queryParameters, Sanitizer::SANITIZER_UTF8_ENCODE);
+        $this->bodyParameters = Sanitizer::sanitize($this->bodyParameters, Sanitizer::SANITIZER_UTF8_ENCODE);
 	}
 	
 	/**
@@ -337,7 +342,7 @@ class HttpRequest
 	public function getFileAsFile($key): ?UploadedFile
 	{
 		$file = $this->getFile($key, null);
-		if ($file === null)
+		if ($file === null || !is_uploaded_file($file['tmp_name']))
 			return null;
 		
 		return new UploadedFile($file);
@@ -563,4 +568,10 @@ class HttpRequest
 		}
 		return $this->server[$key];
 	}
+	
+    /*public function getHeaderVariable($key, $defaultValue = null)
+    {
+        // Replace XXXXXX_XXXX with the name of the header you need in UPPERCASE (and with '-' replaced by '_')
+    
+    }*/
 }
