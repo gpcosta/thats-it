@@ -117,11 +117,11 @@ class Translator
 				);
 		}
 		
-		$lowerToken = mb_strtolower($token);
-		if (!is_array($this->translationFile) || !array_key_exists($lowerToken, $this->translationFile))
+		//$lowerToken = mb_strtolower($token);
+		if (!is_array($this->translationFile) || !array_key_exists($token, $this->translationFile))
 			return $token;
 		
-		$translatedText = $this->translationFile[$lowerToken];
+		$translatedText = $this->translationFile[$token];
 		foreach ($variables as $placeholder => $value)
 			$translatedText = str_replace('{{'.$placeholder.'}}', $value, $translatedText);
 		return $translatedText;

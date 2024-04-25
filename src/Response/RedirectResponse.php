@@ -8,6 +8,8 @@
 
 namespace ThatsIt\Response;
 
+use ThatsIt\Sanitizer\Sanitizer;
+
 /**
  * Class RedirectResponse
  * @package ThatsIt\Response
@@ -39,10 +41,12 @@ class RedirectResponse extends HttpResponse
      *
      * @param string $name
      * @param $value
+     * @param int|null $sanitizer
+     * @return void
      */
-    public function addVariable(string $name, $value): void
+    public function addVariable(string $name, $value, ?int $sanitizer = null): void
     {
-        parent::addVariable($name, $value);
+        parent::addVariable($name, $sanitizer === null ? $value : Sanitizer::sanitize($value, $sanitizer));
         $this->setHeader('Location', $this->getNewUrl());
     }
     

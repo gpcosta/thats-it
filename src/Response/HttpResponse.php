@@ -53,6 +53,11 @@ abstract class HttpResponse
     protected $variables = [];
     
     /**
+     * @var array[name => sanitizer]
+     */
+    protected $sanitizersPerVariable = [];
+    
+    /**
      * @var string
      */
     protected $environment = Configurations::ENVIRONMENT_PROD;
@@ -258,10 +263,14 @@ abstract class HttpResponse
     /**
      * @param string $name
      * @param $value
+     * @param int|null $sanitizer
+     * @return void
      */
-    public function addVariable(string $name, $value): void
+    public function addVariable(string $name, $value, ?int $sanitizer = null): void
     {
         $this->variables[$name] = $value;
+        if ($sanitizer !== null)
+            $this->sanitizersPerVariable[$name] = $sanitizer;
     }
     
     /**
@@ -293,17 +302,17 @@ abstract class HttpResponse
     }
     
     /**
-     * Sanitize and encode all variables according with defined Sanitizer
+     * Sanitize and encode all variables according to the defined Sanitizer
      * @return array
      */
     public function getSanitizedVariables(): array
     {
         $sanitizedVariables = [];
-        foreach ($this->variables as $key => $value) {
-            if (is_array($value) && isset($value['sanitizer']))
-                $sanitizedVariables[$key] = Sanitizer::sanitize($value, $value['sanitizer']);
+        foreach ($this->variables as $varName => $varValue) {
+            if (array_key_exists($varName, $this->sanitizersPerVariable))
+                $sanitizedVariables[$varName] = Sanitizer::sanitize($varValue, $this->sanitizersPerVariable[$varName]);
             else
-                $sanitizedVariables[$key] = Sanitizer::sanitize($value, $this->sanitizer);
+                $sanitizedVariables[$varName] = Sanitizer::sanitize($varValue, $this->sanitizer);
         }
         return $sanitizedVariables;
     }

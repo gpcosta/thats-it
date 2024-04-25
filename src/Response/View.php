@@ -65,7 +65,7 @@ class View extends HttpResponse
             $content = ob_get_clean();
         }
         // if there is a component, will print it
-        else if ($this->component && $this->component instanceof AppComponent) {
+        else if ($this->component instanceof AppComponent) {
             $content = $this->component->render();
         }
         echo $content;
