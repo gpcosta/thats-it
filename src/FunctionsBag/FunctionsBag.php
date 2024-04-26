@@ -72,7 +72,7 @@ class FunctionsBag
 			if (is_array($value))
 				continue;
 			
-			if ($value !== '') {
+			if ($value) {
                 // put the value of the variable in a valid string to be part of the url path
                 $value = self::removeAccents($value);
                 $value = str_replace(' ', '-', $value);
