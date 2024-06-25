@@ -72,7 +72,7 @@ class FunctionsBag
 			if (is_array($value))
 				continue;
 			
-			if ($value) {
+			if ($value || $value === 0) {
                 // put the value of the variable in a valid string to be part of the url path
                 $value = self::removeAccents($value);
                 $value = str_replace(' ', '-', $value);
@@ -111,12 +111,18 @@ class FunctionsBag
 			// else removes everything that is inside of brackets
 			$path = preg_replace("/\[.*\]/", "", $path);
 		}*/
-		
-		// will add get variables (this variables are the remain ones from $variables that were not set in $path already)
-		// http_build_query construct a url based in $variables passed to it
-		// preg_replace replaces the escaped brackets with an index and real brackets without index
-		if (count($variables) > 0)
-			$path .= "?" . preg_replace('/\%5B\d+\%5D/', '[]', http_build_query($variables));
+        
+        // add the remain variables to the query string
+        // 1. decode all variables
+        //      why? if some variable comes from the previous URL, there is a possibility that it comes url encoded. so,
+        //           in order to prevent double url encode it, first all variables are url decoded
+        // 2. build the query string (url encoding all variables in the process)
+        // 3. replaces the escaped brackets with an index with real brackets without index
+        if (count($variables) > 0) {
+            foreach ($variables as $key => $value)
+                $variables[$key] = urldecode($value);
+            $path .= "?" . preg_replace('/\%5B\d+\%5D/', '[]', http_build_query($variables));
+        }
 		
 		// if there are some more variables to substitute, it will raise a exception
 		preg_match("/\{.*\}/", $path, $matches);
