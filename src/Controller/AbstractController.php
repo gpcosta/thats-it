@@ -2,10 +2,10 @@
 
 namespace ThatsIt\Controller;
 
-use PDO;
 use Psr\Log\LoggerInterface;
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Database\Database;
+use ThatsIt\Database\PDO;
 use ThatsIt\Exception\PlatformException;
 use ThatsIt\Request\HttpRequest;
 use ThatsIt\Response\HttpResponse;
