@@ -2,7 +2,6 @@
 
 namespace ThatsIt\Database;
 
-use PDO;
 use ThatsIt\Configurations\Configurations;
 use ThatsIt\Exception\PlatformException;
 
