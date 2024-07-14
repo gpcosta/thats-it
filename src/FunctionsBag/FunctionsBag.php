@@ -119,6 +119,10 @@ class FunctionsBag
         // 2. build the query string (url encoding all variables in the process)
         // 3. replaces the escaped brackets with an index with real brackets without index
         if (count($variables) > 0) {
+            foreach ($variables as $key => $value) {
+                if ($value === null)
+                    unset($variables[$key]);
+            }
             foreach ($variables as $key => $value)
                 $variables[$key] = urldecode($value);
             $path .= "?" . preg_replace('/\%5B\d+\%5D/', '[]', http_build_query($variables));
